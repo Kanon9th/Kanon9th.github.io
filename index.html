@@ -146,6 +146,19 @@
                             <!-- 由 JS 渲染 -->
                         </ul>
                     </div>
+
+                    <!-- ═══════════ 在线搜歌（可整块移除：删本 div + style.css 的「在线搜歌」段 + script.js 的「九、在线搜歌」段） ═══════════ -->
+                    <div class="music-search">
+                        <button class="music-search-btn" id="music-search-btn" aria-expanded="false" title="搜索并试听网络歌曲">在线搜歌</button>
+                        <div class="music-search-panel" id="music-search-panel">
+                            <form class="music-search-form" id="music-search-form" autocomplete="off">
+                                <input class="music-search-input" id="music-search-input" type="search" placeholder="搜歌名 / 歌手名" maxlength="50">
+                                <button class="music-search-go" type="submit">搜索</button>
+                            </form>
+                            <iframe class="music-search-frame" id="music-search-frame" src="about:blank" title="51ape 在线音乐搜索" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                    <!-- ═══════════ 在线搜歌 结束 ═══════════ -->
                 </div>
 
                 <!-- 留言板 -->
