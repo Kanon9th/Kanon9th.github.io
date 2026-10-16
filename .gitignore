@@ -1,0 +1,5 @@
+# 本地备份与自检产物不入库
+_backup/
+_shots/
+# 小说源文件不入库（页面使用解析后的 novel-data.js）
+assets/全职法师.txt
