@@ -19,11 +19,23 @@ function setRandomLyric() {
 }
 
 // --------------------------------------------------------
-// 二、歌单数据与渲染
+// 二、歌单数据与渲染（按歌手排序）
 // --------------------------------------------------------
 const playlists = [
-    { title: "彩虹", artist: "周杰伦", src: "assets/周杰伦-彩虹.mp3" },
-    { title: "我不难过", artist: "孙燕姿", src: "assets/孙燕姿-我不难过.mp3" }
+    { title: "去北极忘记你", artist: "Gareth.T", src: "assets/Gareth.T-去北极忘记你.mp3", cover: "assets/去北极忘记你.jpg" },
+    { title: "玻璃", artist: "Gareth.T", src: "assets/Gareth.T-玻璃.mp3", cover: "assets/玻璃.jpg" },
+    { title: "遇上你之前的我", artist: "Gareth.T", src: "assets/Gareth.T-遇上你之前的我.mp3", cover: "assets/遇上你之前的我.jpg" },
+    { title: "一半一半", artist: "TopBarry-INDEcompany", src: "assets/TopBarry-INDEcompany-一半一半.mp3", cover: "assets/一半一半.jpg" },
+    { title: "东京不太热", artist: "封茗囧菌", src: "assets/封茗囧菌-东京不太热.mp3", cover: "assets/东京不太热.jpg" },
+    { title: "乌梅子酱", artist: "李荣浩", src: "assets/李荣浩-乌梅子酱.mp3", cover: "assets/乌梅子酱.jpg" },
+    { title: "刻在我心底的名字", artist: "卢广仲", src: "assets/卢广仲-刻在我心底的名字.mp3", cover: "assets/刻在我心底的名字.jpg" },
+    { title: "我不难过", artist: "孙燕姿", src: "assets/孙燕姿-我不难过.mp3", cover: "assets/我不难过.jpg" },
+    { title: "半句再见", artist: "孙燕姿", src: "assets/孙燕姿-半句再见.mp3", cover: "assets/半句再见.jpg" },
+    { title: "蝴蝶", artist: "陶喆", src: "assets/陶喆-蝴蝶.mp3", cover: "assets/蝴蝶.jpg" },
+    { title: "Susan说", artist: "陶喆", src: "assets/陶喆-Susan说.mp3", cover: "assets/Susan说.jpg" },
+    { title: "雨爱", artist: "杨丞琳", src: "assets/杨丞琳-雨爱.mp3", cover: "assets/雨爱.jpg" },
+    { title: "彩虹", artist: "周杰伦", src: "assets/周杰伦-彩虹.mp3", cover: "assets/彩虹.jpg" },
+    { title: "爱在西元前", artist: "周杰伦", src: "assets/周杰伦-爱在西元前.mp3", cover: "assets/爱在西元前.jpg" }
 ];
 
 const musicPlayer = document.getElementById('background-music');
@@ -33,8 +45,7 @@ const iconPlay = document.getElementById('icon-play');
 const iconPause = document.getElementById('icon-pause');
 const nowTitle = document.getElementById('now-title');
 const nowArtist = document.getElementById('now-artist');
-const coverRainbow = document.getElementById('cover-rainbow');
-const coverBunan = document.getElementById('cover-bunan');
+const coverImg = document.getElementById('player-cover');
 const timeCurrent = document.getElementById('time-current');
 const timeTotal = document.getElementById('time-total');
 const listEl = document.getElementById('playlist-list');
@@ -86,10 +97,14 @@ function showToast(message) {
     showToast._timer = setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
-// 封面随歌曲切换：交叉淡入淡出
+// 封面随歌曲切换：淡入切换
 function switchCover(index) {
-    coverRainbow.classList.toggle('show', index === 0);
-    coverBunan.classList.toggle('show', index === 1);
+    const cover = playlists[index].cover;
+    if (coverImg.dataset.src === cover) return;
+    coverImg.dataset.src = cover;
+    coverImg.classList.remove('show');
+    coverImg.onload = () => coverImg.classList.add('show');
+    coverImg.src = cover;
 }
 
 function selectSong(index) {

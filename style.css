@@ -817,6 +817,29 @@ a, button, .playlist-item {
     list-style: none;
     margin: 0;
     padding: 0;
+    /* 列表过长时模块内滚动，不改变卡片尺寸 */
+    max-height: 216px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(26, 188, 156, 0.45) transparent;
+}
+
+.playlist-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.playlist-list::-webkit-scrollbar-thumb {
+    background: rgba(26, 188, 156, 0.45);
+    border-radius: 999px;
+}
+
+.playlist-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(26, 188, 156, 0.65);
+}
+
+.playlist-list::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .playlist-item {
