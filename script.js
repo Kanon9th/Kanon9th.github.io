@@ -588,34 +588,6 @@ readStopBtn.addEventListener('click', (e) => {
 });
 
 // --------------------------------------------------------
-// 九、在线搜歌（可整块移除：删本段 + index.html 的「在线搜歌」块 + style.css 的「在线搜歌」段）
-// 依赖第三方站点 at38.cn，随时可能失效；失效时删除这三处即可恢复原样
-// --------------------------------------------------------
-const musicSearchBtn = document.getElementById('music-search-btn');
-const musicSearchPanel = document.getElementById('music-search-panel');
-const musicSearchForm = document.getElementById('music-search-form');
-const musicSearchInput = document.getElementById('music-search-input');
-const musicSearchFrame = document.getElementById('music-search-frame');
-
-musicSearchBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = musicSearchPanel.classList.toggle('open');
-    musicSearchBtn.setAttribute('aria-expanded', String(open));
-});
-
-musicSearchForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const q = musicSearchInput.value.trim();
-    if (!q) {
-        showToast('请输入要搜索的歌名或歌手');
-        return;
-    }
-    musicSearchFrame.src = 'https://www.at38.cn/?keyword=' + encodeURIComponent(q);
-    musicSearchPanel.classList.add('open');
-    musicSearchBtn.setAttribute('aria-expanded', 'true');
-});
-
-// --------------------------------------------------------
 // 七、留言板：localStorage 本地保存
 // --------------------------------------------------------
 const GUESTBOOK_KEY = 'kanon_guestbook';
