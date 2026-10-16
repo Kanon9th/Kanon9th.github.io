@@ -1067,7 +1067,6 @@ a.card:hover .card-link-icon {
     .about-grid {
         grid-template-columns: 1fr 1.1fr;
         gap: 24px;
-        align-items: start;
     }
 
     .card-container {

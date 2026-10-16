@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>动漫鉴赏 - Kanon</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231f2d3d'/%3E%3Cpath d='M9 17V7l7-2v10' fill='none' stroke='%231abc9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://miaoda.feishu.cn">
+    <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ============================ */
+        /* 动漫鉴赏页 · 专属样式         */
+        /* ============================ */
+
+        /* 当前页导航高亮：下划线常驻 */
+        .nav-current {
+            color: #fff;
+        }
+        .nav-current::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .anime-hero {
+            padding-bottom: 4px;
+        }
+
+        .anime-desc {
+            color: var(--muted);
+            font-size: 0.95em;
+            margin: -14px 0 0;
+        }
+
+        .anime-stage-section {
+            display: grid;
+            gap: 20px;
+            padding-top: 40px;
+        }
+
+        /* 深色舞台：简洁、干净、聚焦画面 */
+        .anime-stage {
+            background: linear-gradient(160deg, #1b2836, #141c26);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow-hover);
+            border-top: 3px solid var(--accent);
+        }
+
+        .anime-stage-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .anime-stage-head .now-label {
+            color: rgba(219, 228, 234, 0.55);
+        }
+
+        .anime-stage-head .now-title {
+            color: #fff;
+            font-size: 1.15em;
+        }
+
+        .video-wrap {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            background: #0d131b;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .anime-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        /* 舞台上的播放按钮用薄荷绿，更醒目 */
+        .anime-controls .toggle-btn {
+            background: var(--accent);
+        }
+
+        .anime-controls .toggle-btn:hover {
+            background: var(--accent-dark);
+        }
+
+        #video-progress {
+            width: 100%;
+            display: block;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.14);
+            border: none;
+            border-radius: 3px;
+        }
+
+        #video-progress::-webkit-progress-bar {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 3px;
+        }
+
+        #video-progress::-webkit-progress-value {
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        #video-progress::-moz-progress-bar {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .anime-controls .time-row {
+            color: rgba(219, 228, 234, 0.7);
+        }
+
+        /* 收藏片段列表 */
+        .anime-library {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 26px;
+            border: 1px dashed rgba(31, 45, 61, 0.16);
+            transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+        }
+
+        .anime-library:hover {
+            border-color: rgba(26, 188, 156, 0.45);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .anime-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .anime-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 0.95em;
+            transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+        }
+
+        .anime-item::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            flex: none;
+            border-radius: 50%;
+            background: var(--line);
+            transition: background 0.25s var(--ease);
+        }
+
+        .anime-item:hover {
+            background: rgba(26, 188, 156, 0.08);
+            transform: translateX(4px);
+        }
+
+        .anime-item.active {
+            background: rgba(26, 188, 156, 0.12);
+            color: var(--accent-dark);
+            font-weight: 500;
+        }
+
+        .anime-item.active::before {
+            background: var(--accent);
+        }
+
+        .anime-more {
+            color: var(--muted);
+            font-size: 0.85em;
+            margin: 16px 0 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="site-logo">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path d="M9 17V7l7-2v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Kanon
+        </h1>
+        <nav class="site-nav" aria-label="主导航">
+            <a href="index.html">首页</a>
+            <a href="index.html#about">关于我</a>
+            <a href="index.html#tech">技术分享</a>
+            <a href="index.html#contact">联系我</a>
+            <a href="index.html#guestbook">留言板</a>
+            <a href="anime.html" class="nav-current">动漫鉴赏</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <section class="content-section anime-hero">
+            <h2 class="section-title">动漫 MAD / AMV 鉴赏</h2>
+            <p class="anime-desc">收藏喜欢的动漫片段与混剪，在光影与节奏里，重新遇见那些画面。</p>
+        </section>
+
+        <section class="content-section anime-stage-section">
+            <!-- 主放映区 -->
+            <div class="anime-stage">
+                <div class="anime-stage-head">
+                    <div>
+                        <p class="now-label">正在放映</p>
+                        <p class="now-title" id="anime-title">无职转生 · 片段一</p>
+                    </div>
+                </div>
+                <div class="video-wrap">
+                    <video id="anime-video" preload="metadata" playsinline>
+                        <source src="assets/无职1.mp4" type="video/mp4">
+                        您的浏览器不支持视频播放。
+                    </video>
+                </div>
+                <div class="anime-controls">
+                    <button id="video-toggle" class="toggle-btn" aria-label="播放或暂停视频" title="播放 / 暂停">
+                        <svg id="video-icon-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                            <path d="M8 5.5v13l11-6.5z" fill="currentColor"/>
+                        </svg>
+                        <svg id="video-icon-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:none">
+                            <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                    <div class="progress-wrap">
+                        <progress id="video-progress" value="0" max="1"></progress>
+                        <div class="time-row">
+                            <span id="video-current">0:00</span>
+                            <span id="video-total">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收藏片段 -->
+            <div class="anime-library">
+                <p class="playlist-title">收藏片段</p>
+                <ul class="anime-list" id="anime-list">
+                    <li class="anime-item active" data-src="assets/无职1.mp4" data-title="无职转生 · 片段一">无职转生 · 片段一</li>
+                </ul>
+                <p class="anime-more">更多片段持续收录中…</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2026 Kanon · 用代码与音乐记录生活</p>
+    </footer>
+
+    <script>
+        // ====================================================
+        // 动漫鉴赏播放器：播放/暂停 + 进度条 + 片段切换
+        // ====================================================
+        const video = document.getElementById('anime-video');
+        const toggleBtn = document.getElementById('video-toggle');
+        const iconPlay = document.getElementById('video-icon-play');
+        const iconPause = document.getElementById('video-icon-pause');
+        const progress = document.getElementById('video-progress');
+        const timeCurrent = document.getElementById('video-current');
+        const timeTotal = document.getElementById('video-total');
+        const titleEl = document.getElementById('anime-title');
+        const listEl = document.getElementById('anime-list');
+
+        function formatTime(seconds) {
+            if (!isFinite(seconds) || seconds < 0) return '0:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${String(s).padStart(2, '0')}`;
+        }
+
+        function updateIcon(playing) {
+            iconPlay.style.display = playing ? 'none' : 'block';
+            iconPause.style.display = playing ? 'block' : 'none';
+            toggleBtn.setAttribute('aria-label', playing ? '暂停视频' : '播放视频');
+            toggleBtn.title = playing ? '暂停' : '播放';
+        }
+
+        // 播放 / 暂停
+        toggleBtn.addEventListener('click', () => {
+            if (video.paused) {
+                video.play().then(() => updateIcon(true)).catch(() => {});
+            } else {
+                video.pause();
+                updateIcon(false);
+            }
+        });
+
+        // 进度与时间
+        video.addEventListener('timeupdate', () => {
+            if (video.duration) {
+                progress.value = video.currentTime / video.duration;
+                timeCurrent.textContent = formatTime(video.currentTime);
+            }
+        });
+
+        video.addEventListener('loadedmetadata', () => {
+            timeTotal.textContent = formatTime(video.duration);
+        });
+
+        video.addEventListener('ended', () => {
+            updateIcon(false);
+        });
+
+        // 点击进度条跳转
+        progress.addEventListener('click', (e) => {
+            const rect = progress.getBoundingClientRect();
+            if (video.duration) {
+                video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
+            }
+        });
+
+        // 片段切换（后续新增片段只需在列表中加一项）
+        listEl.querySelectorAll('.anime-item').forEach((item) => {
+            item.addEventListener('click', () => {
+                const isCurrent = item.classList.contains('active') &&
+                    video.src && video.src.indexOf(item.dataset.src) !== -1;
+                if (isCurrent) {
+                    // 再次点击当前片段：切换播放/暂停
+                    if (video.paused) {
+                        video.play().then(() => updateIcon(true)).catch(() => {});
+                    } else {
+                        video.pause();
+                        updateIcon(false);
+                    }
+                    return;
+                }
+
+                listEl.querySelectorAll('.anime-item').forEach((i) => {
+                    i.classList.toggle('active', i === item);
+                });
+                titleEl.textContent = item.dataset.title;
+                video.src = item.dataset.src;
+                video.load();
+                progress.value = 0;
+                timeCurrent.textContent = '0:00';
+                timeTotal.textContent = '--:--';
+                video.play().then(() => updateIcon(true)).catch(() => {});
+            });
+        });
+    </script>
+</body>
+</html>
