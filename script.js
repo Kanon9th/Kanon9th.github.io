@@ -212,12 +212,26 @@ function handleScroll() {
 
 window.addEventListener('scroll', handleScroll, { passive: true });
 
+// --------------------------------------------------------
+// 六、顶栏高度自适应：固定导航无论多高都不遮挡首屏内容
+// --------------------------------------------------------
+function fitHeader() {
+    const header = document.querySelector('.header');
+    if (header) {
+        document.body.style.paddingTop = header.offsetHeight + 'px';
+    }
+}
+
+window.addEventListener('resize', fitHeader);
+window.addEventListener('load', fitHeader);
+
 // 页面加载时触发一次
 window.addEventListener('DOMContentLoaded', () => {
     setRandomLyric();
     handleScroll();
     initNovel();
     renderGuestbook();
+    fitHeader();
 });
 
 // --------------------------------------------------------

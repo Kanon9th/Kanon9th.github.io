@@ -68,7 +68,10 @@ a, button, .playlist-item {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #14695c;
+    background:
+        radial-gradient(640px 220px at 18% -70%, rgba(26, 188, 156, 0.28), transparent 70%),
+        radial-gradient(560px 200px at 86% -60%, rgba(255, 255, 255, 0.12), transparent 60%),
+        #14695c;
     color: #fff;
     padding: 14px 5%;
     display: flex;
@@ -108,60 +111,55 @@ a, button, .playlist-item {
 .site-nav {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
 }
 
+/* 导航项：透明液态玻璃胶囊（统一所有链接） */
 .site-nav a {
-    position: relative;
     color: #dff3ec;
     text-decoration: none;
-    margin-left: 22px;
-    font-size: 0.95em;
-    padding: 4px 0;
-    transition: color 0.3s var(--ease), transform 0.3s var(--ease);
-}
-
-/* 导航悬停：下划线从右到左滑入 + 轻微上浮 */
-.site-nav a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 2px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.35s var(--ease);
+    margin-left: 0;
+    font-size: 0.92em;
+    padding: 7px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    backdrop-filter: blur(14px) saturate(1.3);
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease),
+                color 0.3s var(--ease), transform 0.3s var(--ease),
+                box-shadow 0.3s var(--ease);
 }
 
 .site-nav a:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.34);
     color: #fff;
     transform: translateY(-1px);
 }
 
-.site-nav a:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
+/* 当前页高亮：更亮的玻璃 + 白色描边 */
+.site-nav a.nav-current {
+    background: rgba(255, 255, 255, 0.17);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #fff;
 }
 
-/* 突出入口：胶囊按钮（动漫鉴赏） */
+/* 突出入口：薄荷绿玻璃（动漫鉴赏） */
 .site-nav a.nav-featured {
-    background: var(--accent);
-    color: #fff;
-    padding: 7px 18px;
-    border-radius: 999px;
+    background: rgba(26, 188, 156, 0.16);
+    border-color: rgba(26, 188, 156, 0.45);
+    color: #eafaf6;
     font-weight: 500;
 }
 
-.site-nav a.nav-featured::after {
-    display: none;
-}
-
 .site-nav a.nav-featured:hover {
-    background: var(--accent-dark);
+    background: rgba(26, 188, 156, 0.30);
+    border-color: rgba(26, 188, 156, 0.7);
     color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(26, 188, 156, 0.4);
+    box-shadow: 0 4px 14px rgba(26, 188, 156, 0.25);
 }
 
 /* ============================ */

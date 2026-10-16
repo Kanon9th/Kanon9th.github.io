@@ -531,6 +531,16 @@
         }
         window.addEventListener('scroll', onScrollHeader, { passive: true });
         onScrollHeader();
+
+        // 顶栏高度自适应：固定导航不遮挡首屏内容
+        function fitHeader() {
+            if (header) {
+                document.body.style.paddingTop = header.offsetHeight + 'px';
+            }
+        }
+        window.addEventListener('resize', fitHeader);
+        window.addEventListener('load', fitHeader);
+        fitHeader();
     </script>
 </body>
 </html>
