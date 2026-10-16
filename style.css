@@ -1,0 +1,896 @@
+/* ============================================
+   Kanon 个人博客 · 样式
+   基调：深蓝墨 + 薄荷绿，衬线标题 + 无衬线正文
+   ============================================ */
+
+:root {
+    --ink: #1f2d3d;
+    --ink-soft: #2c3e50;
+    --accent: #1abc9c;
+    --accent-dark: #16a085;
+    --bg: #f4f7f9;
+    --card: #ffffff;
+    --text: #33404f;
+    --muted: #7f8c8d;
+    --line: #e6ecf0;
+    --radius: 12px;
+    --shadow: 0 4px 16px rgba(31, 45, 61, 0.08);
+    --shadow-hover: 0 12px 28px rgba(31, 45, 61, 0.14);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-weight: 300;
+    margin: 0;
+    padding-top: 64px;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    scroll-behavior: smooth;
+    cursor: default;
+}
+
+/* 可交互元素才显示手型指针 */
+a, button, .playlist-item {
+    cursor: pointer;
+}
+
+/* 键盘焦点可见 */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ============================ */
+/* Header（固定导航栏）          */
+/* ============================ */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--ink-soft);
+    color: #fff;
+    padding: 14px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    border-bottom: 2px solid var(--accent);
+    z-index: 100;
+}
+
+.site-logo {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 700;
+    font-size: 1.4em;
+    letter-spacing: 0.04em;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.site-logo svg {
+    color: var(--accent);
+    transition: transform 0.4s var(--ease);
+}
+
+.site-logo:hover svg {
+    transform: rotate(-12deg) scale(1.1);
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+}
+
+.site-nav a {
+    position: relative;
+    color: #dbe4ea;
+    text-decoration: none;
+    margin-left: 22px;
+    font-size: 0.95em;
+    padding: 4px 0;
+    transition: color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+/* 导航悬停：下划线从右到左滑入 + 轻微上浮 */
+.site-nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s var(--ease);
+}
+
+.site-nav a:hover {
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.site-nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* ============================ */
+/* 页面容器与通用区块             */
+/* ============================ */
+.page-container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 5%;
+}
+
+.content-section {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 72px;
+}
+
+.section-title {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 1.7em;
+    margin: 0 0 24px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--accent);
+    display: inline-block;
+}
+
+/* ============================ */
+/* 关于我：两栏布局               */
+/* ============================ */
+.about-grid {
+    display: grid;
+    gap: 20px;
+}
+
+/* 左栏：个人资料卡片 */
+.profile-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+}
+
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.avatar-placeholder {
+    width: 96px;
+    height: 96px;
+    flex: none;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #fff;
+    box-shadow: 0 6px 16px rgba(31, 45, 61, 0.16);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+
+.avatar-placeholder:hover {
+    transform: scale(1.06) rotate(-2deg);
+    border-color: var(--accent);
+}
+
+.avatar-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-name {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 700;
+    font-size: 1.25em;
+    color: var(--ink);
+    margin: 0;
+}
+
+.profile-tagline {
+    color: var(--muted);
+    font-size: 0.92em;
+    margin: 4px 0 0;
+}
+
+.intro-text {
+    margin: 0 0 14px;
+    font-size: 0.95em;
+}
+
+/* 随机歌词：衬线字体，颜色沿用薄荷绿体系 */
+.subtitle {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 500;
+    font-size: 1.05em;
+    color: var(--accent-dark);
+    margin: 0;
+    padding: 12px 16px;
+    background: rgba(26, 188, 156, 0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+}
+
+/* ============================ */
+/* 左栏容器：个人资料 + 小说     */
+/* ============================ */
+.about-left {
+    display: grid;
+    gap: 20px;
+    align-content: start;
+}
+
+/* ============================ */
+/* 小说模块                      */
+/* ============================ */
+.novel-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px;
+    position: relative;
+}
+
+.novel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.novel-title {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 700;
+    font-size: 1.2em;
+    color: var(--ink);
+    margin: 0;
+}
+
+.novel-author {
+    color: var(--muted);
+    font-size: 0.9em;
+    margin: 2px 0 0;
+}
+
+.novel-head-actions {
+    display: flex;
+    gap: 8px;
+    flex: none;
+}
+
+.novel-book-btn {
+    flex: none;
+    font-size: 0.85em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink-soft);
+    background: transparent;
+    transition: background 0.3s var(--ease), color 0.3s var(--ease), transform 0.25s var(--ease);
+}
+
+.novel-book-btn:hover {
+    background: var(--ink-soft);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* 章节切换栏 */
+.novel-chapter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.chapter-btn {
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.chapter-btn:hover:not(:disabled) {
+    background: rgba(26, 188, 156, 0.1);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    transform: scale(1.08);
+}
+
+.chapter-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.novel-chapter-name {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-size: 0.98em;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 章节正文 */
+.novel-content {
+    max-height: 320px;
+    overflow-y: auto;
+    font-size: 0.95em;
+    line-height: 1.75;
+    color: var(--text);
+    transition: opacity 0.35s var(--ease);
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+}
+
+.novel-content.fading {
+    opacity: 0;
+}
+
+.novel-content p {
+    margin: 0 0 0.6em;
+    text-indent: 2em;
+}
+
+/* 切换书籍面板 */
+.novel-book-panel {
+    position: absolute;
+    top: 74px;
+    right: 26px;
+    width: 220px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 14px 32px rgba(31, 45, 61, 0.16);
+    padding: 14px 16px;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(-6px);
+    visibility: hidden;
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s;
+}
+
+.novel-book-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.panel-hint {
+    font-size: 0.8em;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 0 0 8px;
+}
+
+.book-list {
+    display: grid;
+    gap: 6px;
+}
+
+.book-item {
+    text-align: left;
+    font-size: 0.95em;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.book-item:hover {
+    background: rgba(26, 188, 156, 0.1);
+    color: var(--accent-dark);
+}
+
+.book-item.active {
+    background: rgba(26, 188, 156, 0.14);
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
+.panel-empty {
+    font-size: 0.82em;
+    color: var(--muted);
+    margin: 8px 0 0;
+    text-align: center;
+}
+
+/* 章节选择面板 */
+.novel-chapter-panel {
+    position: absolute;
+    top: 74px;
+    right: 26px;
+    width: 320px;
+    max-width: calc(100% - 52px);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 14px 32px rgba(31, 45, 61, 0.16);
+    padding: 14px 16px;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(-6px);
+    visibility: hidden;
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s;
+}
+
+.novel-chapter-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.chapter-list {
+    max-height: 300px;
+    overflow-y: auto;
+    display: grid;
+    gap: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+}
+
+.chapter-item {
+    text-align: left;
+    font-size: 0.9em;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.chapter-item:hover {
+    background: rgba(26, 188, 156, 0.1);
+    color: var(--accent-dark);
+}
+
+.chapter-item.active {
+    background: rgba(26, 188, 156, 0.14);
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
+/* ============================ */
+/* 右栏：音乐播放器               */
+/* ============================ */
+.music-player-container {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px;
+}
+
+.player-head {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.player-cover {
+    width: 84px;
+    height: 84px;
+    flex: none;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 6px 14px rgba(31, 45, 61, 0.18);
+}
+
+/* 双封面图层：切歌时交叉淡入淡出 */
+.player-cover img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease);
+}
+
+.player-cover img.show {
+    opacity: 1;
+}
+
+.player-now {
+    min-width: 0;
+}
+
+.now-label {
+    font-size: 0.78em;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin: 0 0 2px;
+    text-transform: uppercase;
+}
+
+.now-title {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 700;
+    font-size: 1.2em;
+    color: var(--ink);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.now-artist {
+    color: var(--muted);
+    font-size: 0.9em;
+    margin: 2px 0 0;
+}
+
+/* 播放控制行 */
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.toggle-btn {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    border: none;
+    border-radius: 50%;
+    background: var(--ink-soft);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(31, 45, 61, 0.28);
+    transition: background 0.3s var(--ease), transform 0.25s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.toggle-btn:hover {
+    background: var(--accent-dark);
+    transform: scale(1.08);
+    box-shadow: 0 8px 20px rgba(22, 160, 133, 0.35);
+}
+
+.toggle-btn:active {
+    transform: scale(0.94);
+}
+
+/* 进度条 */
+.progress-wrap {
+    flex: 1;
+    min-width: 0;
+}
+
+#music-progress {
+    width: 100%;
+    display: block;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: var(--line);
+    border: none;
+    border-radius: 3px;
+}
+
+#music-progress::-webkit-progress-bar {
+    background: var(--line);
+    border-radius: 3px;
+}
+
+#music-progress::-webkit-progress-value {
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.1s linear;
+}
+
+#music-progress::-moz-progress-bar {
+    background: var(--accent);
+    border-radius: 3px;
+}
+
+.time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+}
+
+/* 歌单 */
+.playlist {
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+}
+
+.playlist-title {
+    font-size: 0.82em;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 0 0 8px;
+}
+
+.playlist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.playlist-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+/* 用 transform 位移代替 padding-left，避免触发重排，动画更流畅 */
+.playlist-item:hover {
+    background: rgba(26, 188, 156, 0.08);
+    transform: translateX(4px);
+}
+
+.playlist-item.active {
+    background: rgba(26, 188, 156, 0.12);
+}
+
+.playlist-item.active .pl-name {
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
+.pl-name {
+    font-size: 0.95em;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playlist-item.soon .pl-name {
+    color: var(--muted);
+}
+
+/* ============================ */
+/* 技术分享：卡片                */
+/* ============================ */
+.card-container {
+    display: grid;
+    gap: 16px;
+}
+
+.card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), opacity 0.5s var(--ease);
+}
+
+/* 可点击的链接卡片 */
+a.card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+/* 外链指示图标：悬停时浮现 */
+.card-link-icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: var(--muted);
+    opacity: 0;
+    transform: translate(-4px, 4px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+a.card:hover .card-link-icon {
+    opacity: 1;
+    transform: translate(0, 0);
+    color: var(--accent-dark);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.card-title {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 8px;
+    font-size: 1.15em;
+}
+
+.card p {
+    margin: 0;
+    font-size: 0.94em;
+    color: var(--muted);
+}
+
+/* 滚动入场动画：进入 0.5s，悬停抬升 0.3s，各自独立流畅 */
+.card[data-visible="false"] {
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+.card[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================ */
+/* 联系区                        */
+/* ============================ */
+.contact-grid {
+    display: grid;
+    gap: 24px;
+    align-items: center;
+}
+
+.contact-text p {
+    margin: 0;
+    font-size: 0.96em;
+}
+
+.contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.95em;
+    font-weight: 500;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink-soft);
+    background: transparent;
+    transition: background 0.3s var(--ease), color 0.3s var(--ease), transform 0.25s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.contact-btn:hover {
+    background: var(--ink-soft);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(31, 45, 61, 0.22);
+}
+
+/* ============================ */
+/* 页脚与 Toast                  */
+/* ============================ */
+.site-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85em;
+    padding: 28px 5% 32px;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--ink-soft);
+    color: #fff;
+    font-size: 0.9em;
+    padding: 10px 20px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+    z-index: 200;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ============================ */
+/* 桌面端：两栏布局               */
+/* ============================ */
+@media (min-width: 768px) {
+    body {
+        padding-top: 72px;
+    }
+
+    .header {
+        padding: 16px 5%;
+    }
+
+    .site-nav a {
+        margin-left: 28px;
+    }
+
+    .content-section {
+        padding: 72px 0;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr 1.1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .card-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1.2fr 1fr;
+        gap: 32px;
+    }
+
+    .contact-actions {
+        justify-content: flex-end;
+    }
+}
+
+/* ============================ */
+/* 无障碍：减少动效              */
+/* ============================ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    .card[data-visible="false"] {
+        opacity: 1;
+        transform: none;
+    }
+}
