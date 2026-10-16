@@ -209,6 +209,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setRandomLyric();
     handleScroll();
     initNovel();
+    renderGuestbook();
 });
 
 // --------------------------------------------------------
@@ -377,3 +378,98 @@ function initNovel() {
     renderBookList();
     renderNovelChapter();
 }
+
+// --------------------------------------------------------
+// 七、留言板：localStorage 本地保存
+// --------------------------------------------------------
+const GUESTBOOK_KEY = 'kanon_guestbook';
+const guestbookForm = document.getElementById('guestbook-form');
+const guestNameInput = document.getElementById('guest-name');
+const guestTextInput = document.getElementById('guest-text');
+const guestbookList = document.getElementById('guestbook-list');
+
+function loadGuestbook() {
+    try {
+        const data = JSON.parse(localStorage.getItem(GUESTBOOK_KEY));
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveGuestbook(entries) {
+    try {
+        localStorage.setItem(GUESTBOOK_KEY, JSON.stringify(entries));
+    } catch (e) {
+        showToast('浏览器存储不可用，留言未能保存');
+    }
+}
+
+function formatGuestTime(date) {
+    const p = (n) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())} ${p(date.getHours())}:${p(date.getMinutes())}`;
+}
+
+function renderGuestbook() {
+    const entries = loadGuestbook();
+    guestbookList.innerHTML = '';
+    if (entries.length === 0) {
+        const empty = document.createElement('li');
+        empty.className = 'guestbook-empty';
+        empty.textContent = '还没有留言，来留下第一条吧。';
+        guestbookList.appendChild(empty);
+        return;
+    }
+
+    // 最新的留言排在最前
+    const frag = document.createDocumentFragment();
+    entries.slice().reverse().forEach((entry) => {
+        const li = document.createElement('li');
+        li.className = 'guest-item';
+
+        const head = document.createElement('div');
+        head.className = 'guest-item-head';
+
+        const name = document.createElement('span');
+        name.className = 'guest-item-name';
+        name.textContent = entry.name || '匿名访客';
+
+        const time = document.createElement('span');
+        time.className = 'guest-item-time';
+        time.textContent = entry.time;
+
+        head.appendChild(name);
+        head.appendChild(time);
+
+        const text = document.createElement('p');
+        text.className = 'guest-item-text';
+        text.textContent = entry.text;
+
+        li.appendChild(head);
+        li.appendChild(text);
+        frag.appendChild(li);
+    });
+    guestbookList.appendChild(frag);
+}
+
+guestbookForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = guestTextInput.value.trim();
+    if (!text) {
+        showToast('留言内容不能为空');
+        return;
+    }
+
+    const entries = loadGuestbook();
+    entries.push({
+        name: guestNameInput.value.trim(),
+        text,
+        time: formatGuestTime(new Date())
+    });
+    saveGuestbook(entries);
+
+    guestTextInput.value = '';
+    guestNameInput.value = '';
+    renderGuestbook();
+    showToast('留言已记录');
+});
