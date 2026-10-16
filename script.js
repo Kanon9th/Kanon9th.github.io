@@ -416,9 +416,32 @@ const readStopBtn = document.getElementById('read-stop');
 let readState = 'idle';     // idle | playing | paused
 let readingIndex = 0;       // 当前读到第几段
 let speechRate = 1.0;       // 语速倍率
+let speechGen = 0;          // 朗读代次：cancel 后旧回调全部失效，杜绝跳句/重复
+let preferredVoice = null;  // 首选语音：云扬 Yunyang
 
 const hasSpeech = () => typeof window.speechSynthesis !== 'undefined'
     && 'SpeechSynthesisUtterance' in window;
+
+// 选择中文语音：优先 Edge 云扬（Yunyang），找不到则用系统默认
+function loadVoice() {
+    try {
+        const voices = window.speechSynthesis.getVoices();
+        preferredVoice = voices.find(v => /yunyang/i.test(v.name)) || null;
+    } catch (e) {
+        preferredVoice = null;
+    }
+}
+
+if (hasSpeech()) {
+    loadVoice();
+    window.speechSynthesis.onvoiceschanged = loadVoice;
+}
+
+// 取消朗读并令旧回调失效
+function cancelSpeech() {
+    speechGen++;
+    window.speechSynthesis.cancel();
+}
 
 function getParaEls() {
     return Array.from(novelContent.querySelectorAll('p'));
@@ -453,7 +476,7 @@ function setReadUI() {
 
 function stopReading() {
     if (readState !== 'idle') {
-        window.speechSynthesis.cancel();
+        cancelSpeech();
         readState = 'idle';
         readingIndex = 0;
         setReadUI();
@@ -485,11 +508,20 @@ function readFrom(index) {
         readFrom(index + 1);
         return;
     }
+    const myGen = speechGen;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'zh-CN';
     u.rate = speechRate;
-    u.onend = () => readFrom(index + 1);
-    u.onerror = () => readFrom(index + 1);   // 个别段落出错自动跳过
+    if (preferredVoice) u.voice = preferredVoice;
+    u.onend = () => {
+        // 已被 cancel 的旧朗读忽略其回调，防止跳句与重复
+        if (myGen !== speechGen) return;
+        readFrom(index + 1);
+    };
+    u.onerror = () => {
+        if (myGen !== speechGen) return;
+        readFrom(index + 1);   // 个别段落出错自动跳过
+    };
     window.speechSynthesis.speak(u);
 }
 
@@ -504,7 +536,7 @@ function toggleRead() {
         setReadUI();
         readFrom(0);
     } else if (readState === 'playing') {
-        window.speechSynthesis.cancel();
+        cancelSpeech();
         readState = 'paused';
         setReadUI();
     } else {
@@ -519,7 +551,7 @@ function changeRate(delta) {
     speechRate = Math.min(1.8, Math.max(0.5, +(speechRate + delta).toFixed(1)));
     readRateEl.textContent = speechRate.toFixed(1) + '×';
     if (readState === 'playing') {
-        window.speechSynthesis.cancel();
+        cancelSpeech();
         readFrom(readingIndex);
     }
 }
