@@ -232,16 +232,26 @@ a, button, .playlist-item {
 /* 左栏容器：个人资料 + 小说     */
 /* ============================ */
 .about-left {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
-    align-content: start;
 }
 
-/* 右栏容器：播放器 + 广告位招租 */
+/* 小说卡片拉伸到底部：与右栏留言板底部对齐 */
+.about-left .novel-card {
+    flex: 1;
+}
+
+/* 右栏容器：播放器 + 留言板 */
 .about-right {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
-    align-content: start;
+}
+
+/* 留言板卡片拉伸到底部：与左栏小说底部对齐 */
+.about-right .guestbook-card {
+    flex: 1;
 }
 
 /* ============================ */
