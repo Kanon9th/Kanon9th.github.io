@@ -704,18 +704,6 @@ a, button, .playlist-item {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 26px;
-    border: 1px dashed var(--line);
-    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
-}
-
-.ad-card:hover {
-    border-color: rgba(26, 188, 156, 0.45);
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-3px);
-}
-
-.ad-card .card-title {
-    margin-bottom: 6px;
 }
 
 .ad-text {
@@ -752,7 +740,8 @@ a, button, .playlist-item {
     padding: 24px;
     position: relative;
     z-index: 1;
-    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), opacity 0.5s var(--ease);
+    border: 1px dashed rgba(31, 45, 61, 0.16);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), opacity 0.5s var(--ease), border-color 0.3s var(--ease);
 }
 
 /* 可点击的链接卡片 */
@@ -783,6 +772,7 @@ a.card:hover .card-link-icon {
 .card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-hover);
+    border-color: rgba(26, 188, 156, 0.45);
 }
 
 .card-title {
@@ -797,6 +787,28 @@ a.card:hover .card-link-icon {
     margin: 0;
     font-size: 0.94em;
     color: var(--muted);
+}
+
+/* ============================ */
+/* 全部模块卡片：虚线边框 + 悬停上浮 */
+/* ============================ */
+.profile-card,
+.novel-card,
+.music-player-container,
+.ad-card,
+.guestbook-card {
+    border: 1px dashed rgba(31, 45, 61, 0.16);
+    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+.profile-card:hover,
+.novel-card:hover,
+.music-player-container:hover,
+.ad-card:hover,
+.guestbook-card:hover {
+    border-color: rgba(26, 188, 156, 0.45);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
 }
 
 /* 滚动入场动画：进入 0.5s，悬停抬升 0.3s，各自独立流畅 */
