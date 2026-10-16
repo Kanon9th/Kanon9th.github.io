@@ -254,7 +254,8 @@ const novelChapterBtn = document.getElementById('novel-chapter-btn');
 const novelChapterPanel = document.getElementById('novel-chapter-panel');
 const chapterList = document.getElementById('chapter-list');
 
-function renderNovelChapter() {
+function renderNovelChapter(keepReading) {
+    if (!keepReading) stopReading();
     const book = novels[novelBook];
     if (!book) {
         novelContent.innerHTML = '<p>未找到小说数据</p>';
@@ -287,13 +288,13 @@ function renderNovelChapter() {
     novelNext.disabled = novelChapter === book.chapters.length - 1;
 }
 
-function goChapter(delta) {
+function goChapter(delta, keepReading) {
     const book = novels[novelBook];
     if (!book) return;
     const next = novelChapter + delta;
     if (next < 0 || next >= book.chapters.length) return;
     novelChapter = next;
-    renderNovelChapter();
+    renderNovelChapter(keepReading);
 }
 
 function openBookPanel() {
@@ -400,6 +401,149 @@ function initNovel() {
     renderBookList();
     renderNovelChapter();
 }
+
+// --------------------------------------------------------
+// 八、小说听书：Web Speech API 朗读当前章节
+// --------------------------------------------------------
+const novelReadBtn = document.getElementById('novel-read-btn');
+const novelReadBar = document.getElementById('novel-read-bar');
+const readStatus = document.getElementById('read-status');
+const readRateEl = document.getElementById('read-rate');
+const readRateDown = document.getElementById('read-rate-down');
+const readRateUp = document.getElementById('read-rate-up');
+const readStopBtn = document.getElementById('read-stop');
+
+let readState = 'idle';     // idle | playing | paused
+let readingIndex = 0;       // 当前读到第几段
+let speechRate = 1.0;       // 语速倍率
+
+const hasSpeech = () => typeof window.speechSynthesis !== 'undefined'
+    && 'SpeechSynthesisUtterance' in window;
+
+function getParaEls() {
+    return Array.from(novelContent.querySelectorAll('p'));
+}
+
+function clearHighlight() {
+    const cur = novelContent.querySelector('p.reading');
+    if (cur) cur.classList.remove('reading');
+}
+
+function highlightPara(i) {
+    clearHighlight();
+    const ps = getParaEls();
+    if (ps[i]) {
+        ps[i].classList.add('reading');
+        ps[i].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+}
+
+function setReadUI() {
+    if (readState === 'idle') {
+        novelReadBtn.textContent = '听书';
+        novelReadBar.classList.remove('show');
+        clearHighlight();
+    } else {
+        novelReadBtn.textContent = readState === 'playing' ? '暂停' : '继续';
+        novelReadBar.classList.add('show');
+        readStatus.textContent = readState === 'playing' ? '正在朗读' : '已暂停';
+    }
+    readRateEl.textContent = speechRate.toFixed(1) + '×';
+}
+
+function stopReading() {
+    if (readState !== 'idle') {
+        window.speechSynthesis.cancel();
+        readState = 'idle';
+        readingIndex = 0;
+        setReadUI();
+    }
+}
+
+function readFrom(index) {
+    const paras = getParaEls();
+    if (index >= paras.length) {
+        // 本章读完：自动续到下一章
+        if (novelNext.disabled) {
+            stopReading();
+            showToast('本书已朗读完毕');
+            return;
+        }
+        goChapter(1, true);
+        setTimeout(() => {
+            if (readState !== 'playing') return;
+            readingIndex = 0;
+            readFrom(0);
+        }, 450);
+        return;
+    }
+    if (readState !== 'playing') return;
+    readingIndex = index;
+    highlightPara(index);
+    const text = paras[index].textContent.trim();
+    if (!text) {
+        readFrom(index + 1);
+        return;
+    }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN';
+    u.rate = speechRate;
+    u.onend = () => readFrom(index + 1);
+    u.onerror = () => readFrom(index + 1);   // 个别段落出错自动跳过
+    window.speechSynthesis.speak(u);
+}
+
+function toggleRead() {
+    if (!hasSpeech()) {
+        showToast('当前浏览器不支持语音朗读');
+        return;
+    }
+    if (readState === 'idle') {
+        readState = 'playing';
+        readingIndex = 0;
+        setReadUI();
+        readFrom(0);
+    } else if (readState === 'playing') {
+        window.speechSynthesis.cancel();
+        readState = 'paused';
+        setReadUI();
+    } else {
+        // 暂停 → 继续（从当前段重新读起，绕开部分浏览器 pause/resume 卡顿）
+        readState = 'playing';
+        setReadUI();
+        readFrom(readingIndex);
+    }
+}
+
+function changeRate(delta) {
+    speechRate = Math.min(1.8, Math.max(0.5, +(speechRate + delta).toFixed(1)));
+    readRateEl.textContent = speechRate.toFixed(1) + '×';
+    if (readState === 'playing') {
+        window.speechSynthesis.cancel();
+        readFrom(readingIndex);
+    }
+}
+
+novelReadBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleRead();
+});
+
+readRateDown.addEventListener('click', (e) => {
+    e.stopPropagation();
+    changeRate(-0.1);
+});
+
+readRateUp.addEventListener('click', (e) => {
+    e.stopPropagation();
+    changeRate(0.1);
+});
+
+readStopBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    stopReading();
+    showToast('已停止朗读');
+});
 
 // --------------------------------------------------------
 // 七、留言板：localStorage 本地保存

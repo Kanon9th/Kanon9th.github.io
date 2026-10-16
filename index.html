@@ -61,6 +61,7 @@
                         <div class="novel-head-actions">
                             <button class="novel-book-btn" id="novel-chapter-btn" aria-expanded="false" aria-controls="novel-chapter-panel">切换章节</button>
                             <button class="novel-book-btn" id="novel-book-btn" aria-expanded="false" aria-controls="novel-book-panel">切换书籍</button>
+                            <button class="novel-book-btn" id="novel-read-btn" aria-expanded="false" title="朗读当前章节">听书</button>
                         </div>
                     </div>
 
@@ -79,6 +80,15 @@
                     </div>
 
                     <div class="novel-content" id="novel-content"></div>
+
+                    <!-- 听书控制条：朗读时显示 -->
+                    <div class="novel-read-bar" id="novel-read-bar" aria-live="polite">
+                        <span class="read-status" id="read-status">正在朗读</span>
+                        <button type="button" class="read-rate-btn" id="read-rate-down" aria-label="放慢语速">−</button>
+                        <span class="read-rate" id="read-rate">1.0×</span>
+                        <button type="button" class="read-rate-btn" id="read-rate-up" aria-label="加快语速">+</button>
+                        <button type="button" class="read-rate-btn read-stop" id="read-stop" aria-label="停止朗读">停止</button>
+                    </div>
 
                     <div class="novel-book-panel" id="novel-book-panel">
                         <p class="panel-hint">选择书籍</p>

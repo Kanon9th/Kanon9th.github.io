@@ -323,6 +323,7 @@ a, button, .playlist-item {
     justify-content: space-between;
     align-items: flex-start;
     gap: 12px;
+    flex-wrap: wrap;
     margin-bottom: 16px;
 }
 
@@ -361,6 +362,91 @@ a, button, .playlist-item {
     background: var(--ink-soft);
     color: #fff;
     transform: translateY(-1px);
+}
+
+/* 听书按钮：薄荷绿描边，突出朗读入口 */
+#novel-read-btn {
+    border-color: var(--accent);
+    color: var(--accent-dark);
+}
+
+#novel-read-btn:hover {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    color: #fff;
+}
+
+/* 朗读中的段落高亮 */
+.novel-content p.reading {
+    background: rgba(26, 188, 156, 0.13);
+    border-radius: 4px;
+    transition: background 0.3s var(--ease);
+}
+
+/* 听书控制条 */
+.novel-read-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(26, 188, 156, 0.08);
+    border: 1px solid rgba(26, 188, 156, 0.28);
+    font-size: 0.85em;
+    color: var(--text);
+    opacity: 0;
+    transform: translateY(-4px);
+    visibility: hidden;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0.3s;
+}
+
+.novel-read-bar.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.read-status {
+    color: var(--accent-dark);
+    font-weight: 500;
+    margin-right: 2px;
+}
+
+.read-rate-btn {
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border: 1px solid rgba(26, 188, 156, 0.4);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--accent-dark);
+    font-size: 1.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.read-rate-btn:hover {
+    background: var(--accent-dark);
+    color: #fff;
+    transform: scale(1.12);
+}
+
+.read-rate {
+    min-width: 40px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+}
+
+.read-rate-btn.read-stop {
+    width: auto;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 0.9em;
 }
 
 /* 章节切换栏 */
