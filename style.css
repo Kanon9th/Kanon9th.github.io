@@ -29,10 +29,24 @@ body {
     margin: 0;
     padding-top: 64px;
     background-color: var(--bg);
+    background-image:
+        radial-gradient(1100px 460px at 50% -140px, rgba(26, 188, 156, 0.055), transparent 70%),
+        radial-gradient(900px 420px at 88% 0%, rgba(31, 45, 61, 0.05), transparent 60%);
     color: var(--text);
     line-height: 1.7;
     scroll-behavior: smooth;
     cursor: default;
+}
+
+/* 细噪点纹理覆盖层：给纯白卡片增加一点印刷质感（0.035 几乎不可见） */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
 }
 
 /* 可交互元素才显示手型指针 */
@@ -63,6 +77,12 @@ a, button, .playlist-item {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
     border-bottom: 2px solid var(--accent);
     z-index: 100;
+    transition: box-shadow 0.3s var(--ease), padding 0.3s var(--ease);
+}
+
+/* 滚动后顶栏阴影加深，层次更分明 */
+.header.scrolled {
+    box-shadow: 0 4px 22px rgba(16, 92, 80, 0.32);
 }
 
 .site-logo {
@@ -168,6 +188,21 @@ a, button, .playlist-item {
     padding-bottom: 10px;
     border-bottom: 3px solid var(--accent);
     display: inline-block;
+    position: relative;
+}
+
+/* 标题左侧薄荷绿竖条装饰 */
+.section-title::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 1.05em;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+    opacity: 0.9;
 }
 
 /* ============================ */
@@ -548,6 +583,12 @@ a, button, .playlist-item {
     overflow: hidden;
     position: relative;
     box-shadow: 0 6px 14px rgba(31, 45, 61, 0.18);
+    transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.player-cover:hover {
+    transform: scale(1.05) rotate(-1deg);
+    box-shadow: 0 10px 24px rgba(31, 45, 61, 0.26);
 }
 
 /* 双封面图层：切歌时交叉淡入淡出 */
@@ -643,6 +684,11 @@ a, button, .playlist-item {
     background: var(--line);
     border: none;
     border-radius: 3px;
+    transition: height 0.25s var(--ease);
+}
+
+#music-progress:hover {
+    height: 9px;
 }
 
 #music-progress::-webkit-progress-bar {
@@ -1112,6 +1158,32 @@ a.card:hover .card-link-icon {
     .contact-actions {
         justify-content: flex-end;
     }
+}
+
+/* ============================ */
+/* 跨页切换过渡（View Transitions）*/
+/* ============================ */
+/* Chrome / Edge 126+ 同源页面间导航自动启用：旧页淡出上移，新页淡入上浮 */
+@keyframes vt-out {
+    to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.995);
+    }
+}
+
+@keyframes vt-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.995);
+    }
+}
+
+::view-transition-old(root) {
+    animation: vt-out 0.28s var(--ease) both;
+}
+
+::view-transition-new(root) {
+    animation: vt-in 0.45s var(--ease) both;
 }
 
 /* ============================ */

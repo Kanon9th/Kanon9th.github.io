@@ -179,7 +179,8 @@ musicPlayer.addEventListener('ended', () => {
 });
 
 // --------------------------------------------------------
-// 五、滚动动画：技术分享卡片入场（rAF 节流，滚动更流畅）
+// 五、滚动动画：卡片入场（rAF 节流，滚动更流畅）
+//     所有带 data-visible 的元素统一做淡入上浮
 // --------------------------------------------------------
 let scrollTicking = false;
 
@@ -188,7 +189,7 @@ function handleScroll() {
     scrollTicking = true;
 
     requestAnimationFrame(() => {
-        const cards = document.querySelectorAll('.tech-card');
+        const cards = document.querySelectorAll('[data-visible]');
         const triggerTop = window.innerHeight - 80;
         cards.forEach(card => {
             const rect = card.getBoundingClientRect();
@@ -198,6 +199,13 @@ function handleScroll() {
                 }
             }
         });
+
+        // 顶栏滚动后加深阴影
+        const header = document.querySelector('.header');
+        if (header) {
+            header.classList.toggle('scrolled', window.scrollY > 10);
+        }
+
         scrollTicking = false;
     });
 }

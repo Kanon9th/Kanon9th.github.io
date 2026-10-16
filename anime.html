@@ -10,8 +10,22 @@
     <link rel="stylesheet" href="style.css">
     <style>
         /* ============================ */
-        /* 动漫鉴赏页 · 专属样式         */
+        /* 动漫鉴赏页 · 沉浸式深色舞台   */
         /* ============================ */
+
+        /* 整页深色：把动漫页做成独立影院氛围 */
+        body {
+            background:
+                radial-gradient(1100px 520px at 12% -8%, rgba(26, 188, 156, 0.12), transparent 60%),
+                radial-gradient(900px 460px at 92% -4%, rgba(31, 45, 61, 0.55), transparent 55%),
+                #0f1620;
+            color: #dbe4ea;
+        }
+
+        /* 噪点稍加强，深色下更有胶片质感 */
+        body::before {
+            opacity: 0.055;
+        }
 
         /* 当前页导航高亮：下划线常驻 */
         .nav-current {
@@ -23,28 +37,54 @@
         }
 
         .anime-hero {
-            padding-bottom: 4px;
+            padding-bottom: 8px;
+        }
+
+        /* 主标题：渐变文字 + 更重的字重 */
+        .anime-hero .section-title {
+            font-weight: 900;
+            font-size: 2.15em;
+            letter-spacing: 0.02em;
+            color: transparent;
+            background: linear-gradient(115deg, #f2fbf8 12%, #54d8bd 68%, var(--accent-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            border-bottom: none;
+            padding-bottom: 6px;
+        }
+
+        .anime-hero .section-title::after {
+            content: "";
+            display: block;
+            width: 64px;
+            height: 3px;
+            margin-top: 12px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
         }
 
         .anime-desc {
-            color: var(--muted);
-            font-size: 0.95em;
-            margin: -14px 0 0;
+            color: rgba(219, 228, 234, 0.6);
+            font-size: 0.98em;
+            margin: -6px 0 0;
         }
 
         .anime-stage-section {
             display: grid;
-            gap: 20px;
-            padding-top: 40px;
+            gap: 22px;
+            padding-top: 44px;
         }
 
-        /* 深色舞台：简洁、干净、聚焦画面 */
+        /* 深色放映舞台：深邃、聚焦、有光感 */
         .anime-stage {
-            background: linear-gradient(160deg, #1b2836, #141c26);
-            border-radius: var(--radius);
-            padding: 26px;
-            box-shadow: var(--shadow-hover);
+            background:
+                radial-gradient(120% 90% at 50% 0%, rgba(26, 188, 156, 0.07), transparent 58%),
+                linear-gradient(165deg, #1a2733, #101820);
+            border-radius: 18px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-top: 3px solid var(--accent);
+            box-shadow: 0 26px 64px rgba(0, 0, 0, 0.38), 0 4px 18px rgba(0, 0, 0, 0.24);
         }
 
         .anime-stage-head {
@@ -52,25 +92,32 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .anime-stage-head .now-label {
-            color: rgba(219, 228, 234, 0.55);
+            color: rgba(219, 228, 234, 0.5);
+            font-size: 0.72em;
+            letter-spacing: 0.22em;
         }
 
         .anime-stage-head .now-title {
             color: #fff;
-            font-size: 1.15em;
+            font-size: 1.2em;
+            font-family: "Noto Serif SC", "PingFang SC", serif;
+            font-weight: 700;
+            margin-top: 4px;
         }
 
+        /* 画面容器：细腻描边 + 深投影 */
         .video-wrap {
             position: relative;
             aspect-ratio: 16 / 9;
-            background: #0d131b;
-            border-radius: 10px;
+            background: #0a1017;
+            border-radius: 12px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
         }
 
         .video-wrap video {
@@ -80,20 +127,58 @@
             display: block;
         }
 
+        /* 视频加载指示：细圆环 + 小字 */
+        .video-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(10, 16, 23, 0.55);
+            color: rgba(219, 228, 234, 0.7);
+            font-size: 0.85em;
+            letter-spacing: 0.18em;
+            opacity: 0;
+            transition: opacity 0.3s var(--ease);
+            pointer-events: none;
+        }
+
+        .video-loading .ring {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid rgba(26, 188, 156, 0.2);
+            border-top-color: var(--accent);
+            animation: ringSpin 0.9s linear infinite;
+        }
+
+        @keyframes ringSpin {
+            to { transform: rotate(360deg); }
+        }
+
         .anime-controls {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-top: 18px;
+            gap: 18px;
+            margin-top: 20px;
         }
 
-        /* 舞台上的播放按钮用薄荷绿，更醒目 */
+        /* 舞台播放按钮：薄荷绿 + 悬停柔光 */
         .anime-controls .toggle-btn {
             background: var(--accent);
+            box-shadow: 0 6px 18px rgba(26, 188, 156, 0.35);
         }
 
         .anime-controls .toggle-btn:hover {
             background: var(--accent-dark);
+            box-shadow: 0 8px 26px rgba(22, 160, 133, 0.45);
+        }
+
+        .progress-wrap {
+            flex: 1;
+            min-width: 0;
         }
 
         #video-progress {
@@ -105,6 +190,11 @@
             background: rgba(255, 255, 255, 0.14);
             border: none;
             border-radius: 3px;
+            transition: height 0.25s var(--ease);
+        }
+
+        #video-progress:hover {
+            height: 9px;
         }
 
         #video-progress::-webkit-progress-bar {
@@ -113,34 +203,38 @@
         }
 
         #video-progress::-webkit-progress-value {
-            background: var(--accent);
+            background: linear-gradient(90deg, var(--accent), #6fe3cd);
             border-radius: 3px;
             transition: width 0.1s linear;
         }
 
         #video-progress::-moz-progress-bar {
-            background: var(--accent);
+            background: linear-gradient(90deg, var(--accent), #6fe3cd);
             border-radius: 3px;
         }
 
         .anime-controls .time-row {
             color: rgba(219, 228, 234, 0.7);
+            font-variant-numeric: tabular-nums;
         }
 
-        /* 收藏片段列表 */
+        /* 收藏片段：深色迷你卡片 + 编号 */
         .anime-library {
-            background-color: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px dashed rgba(219, 228, 234, 0.16);
+            border-radius: 16px;
             padding: 26px;
-            border: 1px dashed rgba(31, 45, 61, 0.16);
             transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
         }
 
         .anime-library:hover {
-            border-color: rgba(26, 188, 156, 0.45);
+            border-color: rgba(26, 188, 156, 0.5);
             transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        }
+
+        .anime-library .playlist-title {
+            color: rgba(219, 228, 234, 0.55);
         }
 
         .anime-list {
@@ -154,45 +248,95 @@
         .anime-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 14px;
-            border-radius: 8px;
+            gap: 14px;
+            padding: 13px 16px;
+            border-radius: 10px;
             cursor: pointer;
-            color: var(--text);
+            color: rgba(219, 228, 234, 0.85);
             font-size: 0.95em;
-            transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.25s var(--ease), color 0.25s var(--ease),
+                        transform 0.25s var(--ease), border-color 0.25s var(--ease);
         }
 
-        .anime-item::before {
-            content: "";
-            width: 8px;
-            height: 8px;
+        .anime-item .anime-num {
+            font-family: "Noto Serif SC", "PingFang SC", serif;
+            font-size: 0.82em;
+            font-weight: 700;
+            color: rgba(219, 228, 234, 0.35);
+            letter-spacing: 0.08em;
+            transition: color 0.25s var(--ease);
             flex: none;
-            border-radius: 50%;
-            background: var(--line);
-            transition: background 0.25s var(--ease);
         }
 
         .anime-item:hover {
             background: rgba(26, 188, 156, 0.08);
-            transform: translateX(4px);
+            border-color: rgba(26, 188, 156, 0.35);
+            transform: translateY(-2px);
         }
 
         .anime-item.active {
-            background: rgba(26, 188, 156, 0.12);
-            color: var(--accent-dark);
+            background: rgba(26, 188, 156, 0.1);
+            border-color: rgba(26, 188, 156, 0.5);
+            color: #fff;
             font-weight: 500;
         }
 
-        .anime-item.active::before {
-            background: var(--accent);
+        .anime-item.active .anime-num {
+            color: var(--accent);
         }
 
         .anime-more {
-            color: var(--muted);
+            color: rgba(219, 228, 234, 0.45);
             font-size: 0.85em;
             margin: 16px 0 0;
             text-align: center;
+            letter-spacing: 0.06em;
+        }
+
+        /* ============================ */
+        /* 入场动画：标题 → 舞台 → 列表  */
+        /* ============================ */
+        .anime-hero,
+        .anime-stage,
+        .anime-library {
+            animation: animeUp 0.7s var(--ease) both;
+        }
+
+        .anime-stage {
+            animation-delay: 0.1s;
+        }
+
+        .anime-library {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes animeUp {
+            from {
+                opacity: 0;
+                transform: translateY(26px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* 深色页页脚文字转浅色 */
+        .site-footer {
+            color: rgba(219, 228, 234, 0.45);
+        }
+
+        /* 移动端：标题缩小，避免断行太散 */
+        @media (max-width: 767px) {
+            .anime-hero .section-title {
+                font-size: 1.5em;
+            }
+
+            .anime-stage {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -234,6 +378,10 @@
                         <source src="assets/无职1.mp4" type="video/mp4">
                         您的浏览器不支持视频播放。
                     </video>
+                    <div class="video-loading" id="video-loading">
+                        <div class="ring"></div>
+                        <span>正在加载</span>
+                    </div>
                 </div>
                 <div class="anime-controls">
                     <button id="video-toggle" class="toggle-btn" aria-label="播放或暂停视频" title="播放 / 暂停">
@@ -258,7 +406,10 @@
             <div class="anime-library">
                 <p class="playlist-title">收藏片段</p>
                 <ul class="anime-list" id="anime-list">
-                    <li class="anime-item active" data-src="assets/无职1.mp4" data-title="无职转生 · 片段一">无职转生 · 片段一</li>
+                    <li class="anime-item active" data-src="assets/无职1.mp4" data-title="无职转生 · 片段一">
+                        <span class="anime-num">01</span>
+                        <span>无职转生 · 片段一</span>
+                    </li>
                 </ul>
                 <p class="anime-more">更多片段持续收录中…</p>
             </div>
@@ -271,7 +422,7 @@
 
     <script>
         // ====================================================
-        // 动漫鉴赏播放器：播放/暂停 + 进度条 + 片段切换
+        // 动漫鉴赏播放器：播放/暂停 + 进度条 + 片段切换 + 加载指示
         // ====================================================
         const video = document.getElementById('anime-video');
         const toggleBtn = document.getElementById('video-toggle');
@@ -282,6 +433,7 @@
         const timeTotal = document.getElementById('video-total');
         const titleEl = document.getElementById('anime-title');
         const listEl = document.getElementById('anime-list');
+        const loadingEl = document.getElementById('video-loading');
 
         function formatTime(seconds) {
             if (!isFinite(seconds) || seconds < 0) return '0:00';
@@ -296,6 +448,9 @@
             toggleBtn.setAttribute('aria-label', playing ? '暂停视频' : '播放视频');
             toggleBtn.title = playing ? '暂停' : '播放';
         }
+
+        function showLoading() { loadingEl.style.opacity = 1; }
+        function hideLoading() { loadingEl.style.opacity = 0; }
 
         // 播放 / 暂停
         toggleBtn.addEventListener('click', () => {
@@ -322,6 +477,12 @@
         video.addEventListener('ended', () => {
             updateIcon(false);
         });
+
+        // 加载指示
+        video.addEventListener('loadstart', showLoading);
+        video.addEventListener('waiting', showLoading);
+        video.addEventListener('canplay', hideLoading);
+        video.addEventListener('playing', hideLoading);
 
         // 点击进度条跳转
         progress.addEventListener('click', (e) => {
@@ -356,9 +517,20 @@
                 progress.value = 0;
                 timeCurrent.textContent = '0:00';
                 timeTotal.textContent = '--:--';
+                showLoading();
                 video.play().then(() => updateIcon(true)).catch(() => {});
             });
         });
+
+        // 顶栏滚动后加深阴影（rAF 合并到同一帧）
+        const header = document.querySelector('.header');
+        function onScrollHeader() {
+            requestAnimationFrame(() => {
+                header.classList.toggle('scrolled', window.scrollY > 10);
+            });
+        }
+        window.addEventListener('scroll', onScrollHeader, { passive: true });
+        onScrollHeader();
     </script>
 </body>
 </html>
