@@ -209,6 +209,8 @@ a, button, .playlist-item {
 .about-grid {
     display: grid;
     gap: 20px;
+    /* 两栏各自自然高：不互相拉伸，矮的一栏不再被拉长 */
+    align-items: start;
 }
 
 /* 左栏：个人资料卡片 */
@@ -290,21 +292,11 @@ a, button, .playlist-item {
     gap: 20px;
 }
 
-/* 小说卡片拉伸到底部：与右栏留言板底部对齐 */
-.about-left .novel-card {
-    flex: 1;
-}
-
 /* 右栏容器：播放器 + 留言板 */
 .about-right {
     display: flex;
     flex-direction: column;
     gap: 20px;
-}
-
-/* 留言板卡片拉伸到底部：与左栏小说底部对齐 */
-.about-right .guestbook-card {
-    flex: 1;
 }
 
 /* ============================ */
