@@ -209,8 +209,7 @@ a, button, .playlist-item {
 .about-grid {
     display: grid;
     gap: 20px;
-    /* 两栏各自自然高：不互相拉伸，矮的一栏不再被拉长 */
-    align-items: start;
+    /* 两栏等高：留言板拉伸至与小说卡片底部对齐 */
 }
 
 /* 左栏：个人资料卡片 */
@@ -299,6 +298,11 @@ a, button, .playlist-item {
     gap: 20px;
 }
 
+/* 留言板卡片拉伸至底部：与左栏小说卡片底部对齐 */
+.about-right .guestbook-card {
+    flex: 1;
+}
+
 /* ============================ */
 /* 小说模块                      */
 /* ============================ */
@@ -377,9 +381,9 @@ a, button, .playlist-item {
     transition: background 0.3s var(--ease);
 }
 
-/* 听书控制条 */
+/* 听书控制条：默认不占位（display:none），避免文字区下方出现白色间隙 */
 .novel-read-bar {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     gap: 10px;
@@ -390,16 +394,10 @@ a, button, .playlist-item {
     border: 1px solid rgba(26, 188, 156, 0.28);
     font-size: 0.85em;
     color: var(--text);
-    opacity: 0;
-    transform: translateY(-4px);
-    visibility: hidden;
-    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0.3s;
 }
 
 .novel-read-bar.show {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
+    display: flex;
 }
 
 .read-status {
@@ -1143,6 +1141,8 @@ a.card:hover .card-link-icon {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 26px;
+    display: flex;
+    flex-direction: column;
 }
 
 .guestbook-fields {
@@ -1218,6 +1218,9 @@ a.card:hover .card-link-icon {
     list-style: none;
     margin: 0;
     padding: 0;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     display: grid;
     gap: 12px;
 }
