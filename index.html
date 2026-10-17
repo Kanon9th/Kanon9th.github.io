@@ -255,7 +255,8 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <script src="novel-data.js"></script>
-    <script src="script.js"></script>
+    <!-- 小说章节索引（小文件）与主脚本均延迟加载，正文分片按需动态注入，不再阻塞首屏 -->
+    <script src="novels/index.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

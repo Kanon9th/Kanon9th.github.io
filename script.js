@@ -245,11 +245,13 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // --------------------------------------------------------
-// 六、小说模块：章节切换 + 书籍面板
+// 六、小说模块：章节切换 + 书籍面板（正文分片按需加载）
+// 索引（novels/index.js）小文件秒开章节列表；正文按片动态注入，跨片自动加载
 // --------------------------------------------------------
-const novels = window.NOVEL_BOOKS || [];
+const novels = window.NOVEL_INDEX || [];
 let novelBook = 0;
 let novelChapter = 0;
+const loadedParts = {};       // 已加载分片缓存（key = 分片文件名）
 
 const novelTitleEl = document.getElementById('novel-title');
 const novelAuthorEl = document.getElementById('novel-author');
@@ -264,35 +266,74 @@ const novelChapterBtn = document.getElementById('novel-chapter-btn');
 const novelChapterPanel = document.getElementById('novel-chapter-panel');
 const chapterList = document.getElementById('chapter-list');
 
+// 当前章节所在分片
+function partOf(chapterIdx) {
+    const book = novels[novelBook];
+    if (!book) return null;
+    return book.parts.find(p => chapterIdx >= p.start && chapterIdx <= p.end) || null;
+}
+
+// 确保分片已加载，未加载则动态注入脚本
+function ensurePart(part, cb) {
+    if (loadedParts[part.file]) { cb(); return; }
+    const s = document.createElement('script');
+    s.src = 'novels/' + part.file;
+    s.onload = () => {
+        loadedParts[part.file] = true;
+        cb();
+    };
+    s.onerror = () => {
+        novelContent.innerHTML = '<p class="novel-tip">章节加载失败，请刷新重试</p>';
+    };
+    document.head.appendChild(s);
+}
+
 function renderNovelChapter(keepReading) {
     if (!keepReading) stopReading();
     const book = novels[novelBook];
     if (!book) {
-        novelContent.innerHTML = '<p>未找到小说数据</p>';
+        novelContent.innerHTML = '<p class="novel-tip">未找到小说数据</p>';
         return;
     }
     novelTitleEl.textContent = book.title;
     novelAuthorEl.textContent = book.author;
 
-    const ch = book.chapters[novelChapter];
-    novelChapterName.textContent = ch.title;
+    const targetCh = novelChapter;
+    novelChapterName.textContent = book.chapters[targetCh] || '';
 
-    // 内容淡入切换（先置透明，构建内容后淡入）
+    // 占位提示，正文异步加载后淡入
     novelContent.classList.add('fading');
-    // txt 段落为"每段一行"，按单个换行切分
-    const paragraphs = ch.content.split(/\r?\n/);
-    const frag = document.createDocumentFragment();
-    for (const para of paragraphs) {
-        const t = para.trim();
-        if (!t) continue;
-        const p = document.createElement('p');
-        p.textContent = t;
-        frag.appendChild(p);
+    novelContent.innerHTML = '<p class="novel-tip">章节加载中…</p>';
+
+    const part = partOf(targetCh);
+    if (!part) {
+        novelContent.innerHTML = '<p class="novel-tip">章节数据缺失</p>';
+        return;
     }
-    novelContent.innerHTML = '';
-    novelContent.appendChild(frag);
-    novelContent.scrollTop = 0;
-    requestAnimationFrame(() => requestAnimationFrame(() => novelContent.classList.remove('fading')));
+    ensurePart(part, () => {
+        // 加载期间用户可能已切章，只渲染当前目标章
+        if (novelChapter !== targetCh) return;
+        const ch = (window.NOVEL_PARTS && window.NOVEL_PARTS[book.title]
+            && window.NOVEL_PARTS[book.title][part.idx]
+            && window.NOVEL_PARTS[book.title][part.idx][targetCh - part.start]) || null;
+        if (!ch) {
+            novelContent.innerHTML = '<p class="novel-tip">章节数据缺失</p>';
+            return;
+        }
+        const paragraphs = ch.content.split(/\r?\n/);
+        const frag = document.createDocumentFragment();
+        for (const para of paragraphs) {
+            const t = para.trim();
+            if (!t) continue;
+            const p = document.createElement('p');
+            p.textContent = t;
+            frag.appendChild(p);
+        }
+        novelContent.innerHTML = '';
+        novelContent.appendChild(frag);
+        novelContent.scrollTop = 0;
+        requestAnimationFrame(() => requestAnimationFrame(() => novelContent.classList.remove('fading')));
+    });
 
     novelPrev.disabled = novelChapter === 0;
     novelNext.disabled = novelChapter === book.chapters.length - 1;
@@ -317,15 +358,15 @@ function closeBookPanel() {
     novelBookBtn.setAttribute('aria-expanded', 'false');
 }
 
-// 章节选择面板
+// 章节选择面板：标题来自索引，无需加载正文，秒开
 function renderChapterList() {
     const book = novels[novelBook];
     if (!book) return;
     const frag = document.createDocumentFragment();
-    book.chapters.forEach((ch, i) => {
+    book.chapters.forEach((title, i) => {
         const item = document.createElement('button');
         item.className = 'chapter-item' + (i === novelChapter ? ' active' : '');
-        item.textContent = ch.title;
+        item.textContent = title;
         item.addEventListener('click', () => {
             if (i !== novelChapter) {
                 novelChapter = i;
@@ -541,6 +582,11 @@ function toggleRead() {
         return;
     }
     if (readState === 'idle') {
+        // 章节正文尚未加载完成时不启动朗读
+        if (novelContent.querySelector('.novel-tip')) {
+            showToast('章节加载中，请稍候再听');
+            return;
+        }
         readState = 'playing';
         readingIndex = 0;
         setReadUI();

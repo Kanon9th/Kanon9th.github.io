@@ -13,7 +13,7 @@
     --text: #33404f;
     --muted: #7f8c8d;
     --line: #e6ecf0;
-    --radius: 12px;
+    --radius: 18px;
     --shadow: 0 4px 16px rgba(31, 45, 61, 0.08);
     --shadow-hover: 0 12px 28px rgba(31, 45, 61, 0.14);
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -316,6 +316,8 @@ a, button, .playlist-item {
     box-shadow: var(--shadow);
     padding: 26px;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .novel-head {
@@ -495,9 +497,11 @@ a, button, .playlist-item {
     text-overflow: ellipsis;
 }
 
-/* 章节正文 */
+/* 章节正文：flex 吸收卡片拉伸后的空间；上限 560px 防内容撑爆整栏 */
 .novel-content {
-    max-height: 320px;
+    flex: 1;
+    min-height: 240px;
+    max-height: 560px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.75;
@@ -514,6 +518,14 @@ a, button, .playlist-item {
 .novel-content p {
     margin: 0 0 0.6em;
     text-indent: 2em;
+}
+
+/* 加载占位 / 异常提示 */
+.novel-tip {
+    text-indent: 0;
+    text-align: center;
+    color: var(--muted);
+    padding: 24px 0;
 }
 
 /* 切换书籍面板 */
