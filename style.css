@@ -23,6 +23,12 @@
     box-sizing: border-box;
 }
 
+html {
+    /* 全局防横向溢出：裁剪掉任何越界的装饰元素，不创建滚动容器、不影响内部动画 */
+    overflow-x: clip;
+    overflow-x: hidden;
+}
+
 body {
     font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     font-weight: 300;
@@ -986,9 +992,6 @@ a.card:hover .card-link-icon {
 /* ============================ */
 .tech-section {
     position: relative;
-    /* 装饰柔光斑（right:-40px 等）在窄屏会撑出横向滚动，裁剪掉 */
-    overflow-x: clip;
-    overflow-x: hidden;
 }
 
 /* 背后柔光斑：透过半透明玻璃可见，形成液态玻璃质感 */
@@ -1007,7 +1010,7 @@ a.card:hover .card-link-icon {
     height: 320px;
     background: rgba(26, 188, 156, 0.30);
     top: -70px;
-    left: -50px;
+    left: 12px;
 }
 
 .card-container::after {
@@ -1015,7 +1018,7 @@ a.card:hover .card-link-icon {
     height: 340px;
     background: rgba(52, 152, 219, 0.24);
     bottom: -90px;
-    right: -40px;
+    right: 8px;
 }
 
 /* 液态玻璃：半透明 + 背景模糊 + 高光描边 */
