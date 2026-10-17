@@ -1083,6 +1083,18 @@ a.card:hover .card-link-icon {
     transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
 }
 
+/* 滚动入场动画：进入 0.5s，悬停抬升 0.3s，各自独立流畅 */
+.card[data-visible="false"] {
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+.card[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 悬停上浮：声明在入场动画之后，保证优先级不被 data-visible 覆盖 */
 .profile-card:hover,
 .novel-card:hover,
 .music-player-container:hover,
@@ -1093,15 +1105,10 @@ a.card:hover .card-link-icon {
     box-shadow: var(--shadow-hover);
 }
 
-/* 滚动入场动画：进入 0.5s，悬停抬升 0.3s，各自独立流畅 */
-.card[data-visible="false"] {
-    opacity: 0;
-    transform: translateY(40px);
-}
-
-.card[data-visible="true"] {
-    opacity: 1;
-    transform: translateY(0);
+/* 技术分享卡悬停抬升更高（其 hover 声明较早，此处补回优先级） */
+.tech-card[data-visible="true"]:hover,
+.tech-card:hover {
+    transform: translateY(-8px);
 }
 
 /* ============================ */
@@ -1243,11 +1250,12 @@ a.card:hover .card-link-icon {
     border-radius: 10px;
     background: rgba(26, 188, 156, 0.05);
     border: 1px solid var(--line);
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+    /* 悬停只做颜色/阴影变化，不做位移：避免与卡片上浮叠加造成条目跳动 */
+    transition: background 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
 }
 
 .guest-item:hover {
-    transform: translateY(-2px);
+    background: rgba(26, 188, 156, 0.10);
     border-color: rgba(26, 188, 156, 0.4);
     box-shadow: var(--shadow);
 }
@@ -1261,7 +1269,7 @@ a.card:hover .card-link-icon {
 
 .guest-item-name {
     font-family: "Noto Serif SC", "PingFang SC", serif;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.98em;
     color: var(--ink);
     display: inline-flex;
