@@ -494,11 +494,11 @@ a, button, .playlist-item {
     text-overflow: ellipsis;
 }
 
-/* 章节正文：flex 吸收卡片拉伸空间；上限让卡片长度回到修改前，内容滚动 */
+/* 章节正文：flex 吸收卡片拉伸空间；上限让卡片高度回到 500 多，内容滚动 */
 .novel-content {
     flex: 1;
     min-height: 240px;
-    max-height: 620px;
+    max-height: 360px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.75;
