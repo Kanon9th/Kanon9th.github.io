@@ -727,3 +727,27 @@ guestbookForm.addEventListener('submit', (e) => {
     renderGuestbook();
     showToast('留言已记录');
 });
+
+// 八、站点运行时间：从建站日起实时累计（秒级更新）
+(function () {
+    // 2026.10.17 建站
+    const LAUNCH_DATE = new Date('2026-10-17T00:00:00+08:00');
+    const el = document.getElementById('site-uptime');
+    if (!el) return;
+    const pad = (n) => String(n).padStart(2, '0');
+    function update() {
+        let diff = Math.max(0, Math.floor((Date.now() - LAUNCH_DATE.getTime()) / 1000));
+        const days = Math.floor(diff / 86400);
+        diff -= days * 86400;
+        const hours = Math.floor(diff / 3600);
+        diff -= hours * 3600;
+        const mins = Math.floor(diff / 60);
+        const secs = diff - mins * 60;
+        el.innerHTML =
+            '本站已运行 <span class="up-num">' + days + '</span> 天 <span class="up-num">' +
+            pad(hours) + '</span> 小时 <span class="up-num">' + pad(mins) +
+            '</span> 分 <span class="up-num">' + pad(secs) + '</span> 秒';
+    }
+    update();
+    setInterval(update, 1000);
+})();

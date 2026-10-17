@@ -1318,6 +1318,18 @@ a.card:hover .card-link-icon {
     padding: 28px 5% 32px;
 }
 
+.site-uptime {
+    margin: 8px 0 0;
+    font-size: 0.9em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+}
+
+.site-uptime .up-num {
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
 .toast {
     position: fixed;
     left: 50%;
