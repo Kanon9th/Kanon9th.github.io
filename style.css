@@ -289,6 +289,12 @@ a, button, .playlist-item {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 0;
+}
+
+/* 小说卡片拉伸到底部：与右栏留言板底部对齐（恢复修改前布局） */
+.about-left .novel-card {
+    flex: 1;
 }
 
 /* 右栏容器：播放器 + 留言板 */
@@ -296,9 +302,10 @@ a, button, .playlist-item {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 0;
 }
 
-/* 留言板卡片拉伸至底部：与左栏小说卡片底部对齐 */
+/* 留言板卡片拉伸到底部：与左栏小说卡片底部对齐 */
 .about-right .guestbook-card {
     flex: 1;
 }
@@ -487,11 +494,11 @@ a, button, .playlist-item {
     text-overflow: ellipsis;
 }
 
-/* 章节正文：flex 吸收卡片拉伸后的空间；上限 560px 防内容撑爆整栏 */
+/* 章节正文：flex 吸收卡片拉伸空间；上限让卡片长度回到修改前，内容滚动 */
 .novel-content {
     flex: 1;
     min-height: 240px;
-    max-height: 560px;
+    max-height: 620px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.75;
@@ -979,6 +986,9 @@ a.card:hover .card-link-icon {
 /* ============================ */
 .tech-section {
     position: relative;
+    /* 装饰柔光斑（right:-40px 等）在窄屏会撑出横向滚动，裁剪掉 */
+    overflow-x: clip;
+    overflow-x: hidden;
 }
 
 /* 背后柔光斑：透过半透明玻璃可见，形成液态玻璃质感 */
