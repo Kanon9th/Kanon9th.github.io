@@ -501,10 +501,11 @@ a, button, .playlist-item {
     text-overflow: ellipsis;
 }
 
-/* 章节正文：flex 吸收卡片拉伸空间；内容不足时正文区与卡片底部保持 padding 间隙 */
+/* 章节正文：内容区封顶 360px，恢复原来的紧凑高度；卡片拉伸时正文区不再被拉高 */
 .novel-content {
     flex: 1;
     min-height: 240px;
+    max-height: 360px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.75;
@@ -1218,6 +1219,7 @@ a.card:hover .card-link-icon {
     padding: 0;
     flex: 1;
     min-height: 0;
+    max-height: 360px;
     overflow-y: auto;
     display: grid;
     align-content: start;
