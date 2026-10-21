@@ -51,6 +51,9 @@ musicPlayer.volume = 0.5;
 // 当前选中曲目（默认第一首）
 let currentIndex = 0;
 
+// 听书自动续章标记：等待下一章正文渲染完成后自动从第一段开读
+let pendingAutoNext = false;
+
 // 渲染歌单列表
 playlists.forEach((song, index) => {
     const li = document.createElement('li');
@@ -390,12 +393,25 @@ function renderNovelChapter(keepReading) {
             if (!t) continue;
             const p = document.createElement('p');
             p.textContent = t;
+            p.classList.add('para');
             frag.appendChild(p);
         }
         novelContent.innerHTML = '';
         novelContent.appendChild(frag);
+        // 段落可点击：点击任意段落即从该段开始朗读
+        Array.from(novelContent.querySelectorAll('p')).forEach((p, idx) => {
+            p.addEventListener('click', () => onParaClick(idx));
+        });
         novelContent.scrollTop = 0;
-        requestAnimationFrame(() => requestAnimationFrame(() => novelContent.classList.remove('fading')));
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            novelContent.classList.remove('fading');
+            // 自动续章：上一章读完进入下一章，正文就绪后从第一段自动开读
+            if (pendingAutoNext && readState === 'playing') {
+                pendingAutoNext = false;
+                readingIndex = 0;
+                readFrom(0);
+            }
+        }));
     });
 
     novelPrev.disabled = novelChapter === 0;
@@ -614,25 +630,40 @@ function stopReading() {
         cancelSpeech();
         readState = 'idle';
         readingIndex = 0;
+        pendingAutoNext = false;
         setReadUI();
     }
+}
+
+// 点击正文段落：从该段开始朗读（朗读中随时切换起点，暂停态点击即续读）
+function onParaClick(i) {
+    if (!hasSpeech()) {
+        showToast('当前浏览器不支持语音朗读');
+        return;
+    }
+    if (novelContent.querySelector('.novel-tip')) {
+        showToast('章节加载中，请稍候再听');
+        return;
+    }
+    cancelSpeech();
+    pendingAutoNext = false;
+    readState = 'playing';
+    setReadUI();
+    readingIndex = i;
+    readFrom(i);
 }
 
 function readFrom(index) {
     const paras = getParaEls();
     if (index >= paras.length) {
-        // 本章读完：自动续到下一章
+        // 本章读完：自动续到下一章（等待新章节正文渲染完成后自动开读）
         if (novelNext.disabled) {
             stopReading();
             showToast('本书已朗读完毕');
             return;
         }
+        pendingAutoNext = true;
         goChapter(1, true);
-        setTimeout(() => {
-            if (readState !== 'playing') return;
-            readingIndex = 0;
-            readFrom(0);
-        }, 450);
         return;
     }
     if (readState !== 'playing') return;
