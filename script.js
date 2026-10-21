@@ -134,6 +134,7 @@ function selectSong(index) {
         updatePlayIcon(false);
         showToast('无法自动播放，请再次点击播放按钮');
     });
+    saveMusicProgress();
 }
 
 function togglePlay() {
@@ -148,6 +149,18 @@ function togglePlay() {
         musicPlayer.pause();
         updatePlayIcon(false);
     }
+}
+
+// 断点续播：保存当前歌曲与进度（localStorage）
+let lastMusicSave = 0;
+function saveMusicProgress() {
+    try {
+        localStorage.setItem('kanon_music', JSON.stringify({
+            index: currentIndex,
+            currentTime: musicPlayer.currentTime || 0,
+            mode: playMode
+        }));
+    } catch (e) { /* 存储不可用时静默跳过 */ }
 }
 
 musicToggleBtn.addEventListener('click', togglePlay);
@@ -166,6 +179,11 @@ musicPlayer.addEventListener('timeupdate', () => {
     if (musicPlayer.duration) {
         progressElement.value = musicPlayer.currentTime / musicPlayer.duration;
         timeCurrent.textContent = formatTime(musicPlayer.currentTime);
+    }
+    // 节流保存播放进度（每 3 秒）
+    if (Date.now() - lastMusicSave > 3000) {
+        lastMusicSave = Date.now();
+        saveMusicProgress();
     }
 });
 
@@ -195,19 +213,23 @@ const MODE_ICONS = {
 const MODE_NAMES = { order: '顺序播放', once: '单曲循环', random: '随机播放' };
 const MODE_ORDER = ['order', 'once', 'random'];
 
-function setPlayMode(mode) {
+function setPlayMode(mode, silent) {
     playMode = mode;
     modeIcon.innerHTML = MODE_ICONS[mode];
     modeBtn.title = '播放模式：' + MODE_NAMES[mode] + '（点击切换）';
     modeBtn.setAttribute('aria-label', '播放模式：' + MODE_NAMES[mode]);
-    showToast(MODE_NAMES[mode]);
+    if (!silent) showToast(MODE_NAMES[mode]);
+    saveMusicProgress();
 }
 
 modeBtn.addEventListener('click', () => {
     const next = MODE_ORDER[(MODE_ORDER.indexOf(playMode) + 1) % MODE_ORDER.length];
     setPlayMode(next);
 });
-setPlayMode('order');
+// 初始化模式图标（不写存储，避免覆盖上次保存的播放状态）
+modeIcon.innerHTML = MODE_ICONS[playMode];
+modeBtn.title = '播放模式：' + MODE_NAMES[playMode] + '（点击切换）';
+modeBtn.setAttribute('aria-label', '播放模式：' + MODE_NAMES[playMode]);
 
 // 播放结束：按播放模式处理（原生 loop 已移除，统一由这里控制）
 musicPlayer.addEventListener('ended', () => {
@@ -387,6 +409,14 @@ function goChapter(delta, keepReading) {
     if (next < 0 || next >= book.chapters.length) return;
     novelChapter = next;
     renderNovelChapter(keepReading);
+    saveNovelProgress();
+}
+
+// 断点续读：保存当前书籍与章节（localStorage）
+function saveNovelProgress() {
+    try {
+        localStorage.setItem('kanon_novel', JSON.stringify({ book: novelBook, chapter: novelChapter }));
+    } catch (e) { /* 存储不可用时静默跳过 */ }
 }
 
 function openBookPanel() {
@@ -412,6 +442,7 @@ function renderChapterList() {
             if (i !== novelChapter) {
                 novelChapter = i;
                 renderNovelChapter();
+                saveNovelProgress();
             }
             closeChapterPanel();
         });
@@ -449,6 +480,7 @@ function renderBookList() {
                 novelBook = i;
                 novelChapter = 0;
                 renderNovelChapter();
+                saveNovelProgress();
             }
             closeBookPanel();
         });
@@ -489,6 +521,17 @@ function initNovel() {
             closeChapterPanel();
         }
     });
+
+    // 恢复上次阅读进度（书籍 + 章节），无记录则从第一本第一章开始
+    try {
+        const saved = JSON.parse(localStorage.getItem('kanon_novel'));
+        if (saved && Number.isInteger(saved.book) && saved.book >= 0 && saved.book < novels.length
+            && Number.isInteger(saved.chapter) && saved.chapter >= 0
+            && saved.chapter < novels[saved.book].chapters.length) {
+            novelBook = saved.book;
+            novelChapter = saved.chapter;
+        }
+    } catch (e) { /* 忽略损坏数据 */ }
 
     renderBookList();
     renderNovelChapter();
@@ -791,4 +834,53 @@ guestbookForm.addEventListener('submit', (e) => {
     }
     update();
     setInterval(update, 1000);
+})();
+
+// 九、断点续播：刷新/重开页面后恢复上次的歌曲、进度与播放模式（不自动播放）
+(function () {
+    let saved = null;
+    try {
+        saved = JSON.parse(localStorage.getItem('kanon_music'));
+    } catch (e) { saved = null; }
+    if (!saved) return;
+    const idx = (Number.isInteger(saved.index) && saved.index >= 0 && saved.index < playlists.length)
+        ? saved.index : null;
+
+    if (idx !== null) {
+        const song = playlists[idx];
+        currentIndex = idx;
+        nowTitle.textContent = song.title;
+        nowArtist.textContent = song.artist;
+        switchCover(idx);
+        const items = listEl.querySelectorAll('.playlist-item');
+        items.forEach((item, i) => item.classList.toggle('active', i === idx));
+
+        // 装载歌曲但不自动播放（浏览器限制），定位到保存的进度
+        musicPlayer.src = song.src;
+        musicPlayer.load();
+        progressElement.value = 0;
+        timeCurrent.textContent = '0:00';
+        timeTotal.textContent = '--:--';
+        if (typeof saved.currentTime === 'number' && isFinite(saved.currentTime) && saved.currentTime > 3) {
+            const seek = () => {
+                try {
+                    if (saved.currentTime < musicPlayer.duration - 3) {
+                        musicPlayer.currentTime = saved.currentTime;
+                    }
+                } catch (e) { /* 位置越界时忽略 */ }
+            };
+            if (musicPlayer.readyState >= 1) {
+                seek();
+            } else {
+                musicPlayer.addEventListener('loadedmetadata', seek, { once: true });
+            }
+        }
+    }
+
+    if (saved.mode && MODE_ORDER.indexOf(saved.mode) !== -1) {
+        playMode = saved.mode;
+        modeIcon.innerHTML = MODE_ICONS[saved.mode];
+        modeBtn.title = '播放模式：' + MODE_NAMES[saved.mode] + '（点击切换）';
+        modeBtn.setAttribute('aria-label', '播放模式：' + MODE_NAMES[saved.mode]);
+    }
 })();
