@@ -743,13 +743,7 @@ a, button, .playlist-item {
     margin-bottom: 20px;
 }
 
-/* 播放模式：顺序 / 单曲循环 / 随机 */
-.play-mode {
-    display: flex;
-    gap: 5px;
-    flex: none;
-}
-
+/* 播放模式按钮（网易云风格：单按钮循环切换，置于播放列表标题行，不挤压播放条） */
 .mode-btn {
     width: 30px;
     height: 30px;
@@ -759,7 +753,7 @@ a, button, .playlist-item {
     justify-content: center;
     border: 1px solid rgba(31, 45, 61, 0.16);
     border-radius: 50%;
-    background: transparent;
+    background: rgba(31, 45, 61, 0.03);
     color: var(--muted);
     cursor: pointer;
     transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
@@ -768,18 +762,12 @@ a, button, .playlist-item {
 .mode-btn:hover {
     color: var(--accent-dark);
     border-color: rgba(26, 188, 156, 0.4);
+    background: rgba(26, 188, 156, 0.08);
     transform: translateY(-1px);
 }
 
 .mode-btn:active {
     transform: scale(0.92);
-}
-
-.mode-btn.active {
-    color: #fff;
-    background: var(--accent-dark);
-    border-color: var(--accent-dark);
-    box-shadow: 0 4px 12px rgba(22, 160, 133, 0.3);
 }
 
 .toggle-btn {
@@ -860,11 +848,18 @@ a, button, .playlist-item {
     padding-top: 14px;
 }
 
+.playlist-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
 .playlist-title {
     font-size: 0.82em;
     letter-spacing: 0.1em;
     color: var(--muted);
-    margin: 0 0 8px;
+    margin: 0;
 }
 
 .playlist-list {

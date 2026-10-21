@@ -182,28 +182,32 @@ progressElement.addEventListener('click', (e) => {
     }
 });
 
-// 播放模式：order（顺序列表循环）/ once（单曲循环）/ random（随机）
+// 播放模式：order（列表循环）/ once（单曲循环）/ random（随机）
+// 网易云风格：一个按钮，点击循环切换，图标随模式变化
 let playMode = 'order';
-const modeBtnMap = {
-    order: document.getElementById('mode-order'),
-    once: document.getElementById('mode-once'),
-    random: document.getElementById('mode-random')
+const modeBtn = document.getElementById('mode-btn');
+const modeIcon = document.getElementById('mode-icon');
+const MODE_ICONS = {
+    order: '<path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>',
+    once: '<path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/><path fill="currentColor" d="M13 15V9h-1l-2 1v1h1.5v4H13z"/>',
+    random: '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'
 };
+const MODE_NAMES = { order: '顺序播放', once: '单曲循环', random: '随机播放' };
+const MODE_ORDER = ['order', 'once', 'random'];
 
 function setPlayMode(mode) {
     playMode = mode;
-    Object.keys(modeBtnMap).forEach((key) => {
-        const active = key === mode;
-        modeBtnMap[key].classList.toggle('active', active);
-        modeBtnMap[key].setAttribute('aria-pressed', active);
-    });
-    const names = { order: '顺序播放', once: '单曲循环', random: '随机播放' };
-    showToast(names[mode]);
+    modeIcon.innerHTML = MODE_ICONS[mode];
+    modeBtn.title = '播放模式：' + MODE_NAMES[mode] + '（点击切换）';
+    modeBtn.setAttribute('aria-label', '播放模式：' + MODE_NAMES[mode]);
+    showToast(MODE_NAMES[mode]);
 }
 
-Object.keys(modeBtnMap).forEach((key) => {
-    modeBtnMap[key].addEventListener('click', () => setPlayMode(key));
+modeBtn.addEventListener('click', () => {
+    const next = MODE_ORDER[(MODE_ORDER.indexOf(playMode) + 1) % MODE_ORDER.length];
+    setPlayMode(next);
 });
+setPlayMode('order');
 
 // 播放结束：按播放模式处理（原生 loop 已移除，统一由这里控制）
 musicPlayer.addEventListener('ended', () => {
