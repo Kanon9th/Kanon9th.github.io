@@ -3,6 +3,11 @@
    基调：深蓝墨 + 薄荷绿，衬线标题 + 无衬线正文
    ============================================ */
 
+/* 固定导航遮挡锚点：点击导航跳转时预留顶部导航高度 */
+html {
+    scroll-padding-top: 80px;
+}
+
 :root {
     --ink: #1f2d3d;
     --ink-soft: #2c3e50;
@@ -298,12 +303,12 @@ a, button, .playlist-item {
     min-width: 0;
 }
 
-/* 小说卡片拉伸到底部：与右栏留言板底部对齐（恢复修改前布局） */
+/* 小说卡片保持自然高度：正文区封顶不铺开，卡片约 500+px 紧凑；间隙恒 = padding 30px */
 .about-left .novel-card {
-    flex: 1;
+    flex: 0 0 auto;
 }
 
-/* 右栏容器：播放器 + 留言板 */
+/* 右栏容器：播放器 + 更新日志 */
 .about-right {
     display: flex;
     flex-direction: column;
@@ -311,9 +316,9 @@ a, button, .playlist-item {
     min-width: 0;
 }
 
-/* 留言板卡片拉伸到底部：与左栏小说卡片底部对齐 */
+/* 更新日志卡片：自然高度，列表高度配合使卡片底部与小说卡片平齐 */
 .about-right .guestbook-card {
-    flex: 1;
+    flex: 0 0 auto;
 }
 
 /* ============================ */
@@ -501,7 +506,7 @@ a, button, .playlist-item {
     text-overflow: ellipsis;
 }
 
-/* 章节正文：内容区封顶 360px，恢复原来的紧凑高度；卡片拉伸时正文区不再被拉高 */
+/* 章节正文：封顶 360px 防止整章全文铺开，超长时卡片内滚动；间隙 = 卡片 padding-bottom 30px */
 .novel-content {
     flex: 1;
     min-height: 240px;
@@ -1219,7 +1224,7 @@ a.card:hover .card-link-icon {
     padding: 0;
     flex: 1;
     min-height: 0;
-    max-height: 360px;
+    max-height: 274px;
     overflow-y: auto;
     display: grid;
     align-content: start;
