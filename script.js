@@ -182,10 +182,47 @@ progressElement.addEventListener('click', (e) => {
     }
 });
 
-// 播放结束回到开头
+// 播放模式：order（顺序列表循环）/ once（单曲循环）/ random（随机）
+let playMode = 'order';
+const modeBtnMap = {
+    order: document.getElementById('mode-order'),
+    once: document.getElementById('mode-once'),
+    random: document.getElementById('mode-random')
+};
+
+function setPlayMode(mode) {
+    playMode = mode;
+    Object.keys(modeBtnMap).forEach((key) => {
+        const active = key === mode;
+        modeBtnMap[key].classList.toggle('active', active);
+        modeBtnMap[key].setAttribute('aria-pressed', active);
+    });
+    const names = { order: '顺序播放', once: '单曲循环', random: '随机播放' };
+    showToast(names[mode]);
+}
+
+Object.keys(modeBtnMap).forEach((key) => {
+    modeBtnMap[key].addEventListener('click', () => setPlayMode(key));
+});
+
+// 播放结束：按播放模式处理（原生 loop 已移除，统一由这里控制）
 musicPlayer.addEventListener('ended', () => {
-    musicPlayer.currentTime = 0;
-    updatePlayIcon(false);
+    if (playMode === 'once') {
+        // 单曲循环：从头重播
+        musicPlayer.currentTime = 0;
+        musicPlayer.play().catch(() => {});
+        updatePlayIcon(true);
+    } else if (playMode === 'random') {
+        // 随机：避开刚播完的这首
+        let next = currentIndex;
+        while (playlists.length > 1 && next === currentIndex) {
+            next = Math.floor(Math.random() * playlists.length);
+        }
+        selectSong(next);
+    } else {
+        // 顺序：自动下一首，最后一首回到第一首
+        selectSong((currentIndex + 1) % playlists.length);
+    }
 });
 
 // --------------------------------------------------------

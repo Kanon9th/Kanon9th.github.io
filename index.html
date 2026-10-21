@@ -118,6 +118,24 @@
                     </div>
 
                     <div class="player-controls">
+                        <div class="play-mode" role="group" aria-label="播放模式">
+                            <button id="mode-order" class="mode-btn active" type="button" title="顺序播放" aria-label="顺序播放" aria-pressed="true">
+                                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                                    <path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                                </svg>
+                            </button>
+                            <button id="mode-once" class="mode-btn" type="button" title="单曲循环" aria-label="单曲循环" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                                    <path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                                    <path fill="currentColor" d="M13 15V9h-1l-2 1v1h1.5v4H13z"/>
+                                </svg>
+                            </button>
+                            <button id="mode-random" class="mode-btn" type="button" title="随机播放" aria-label="随机播放" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/>
+                                </svg>
+                            </button>
+                        </div>
                         <button id="music-toggle-btn" class="toggle-btn" aria-label="播放或暂停音乐" title="播放 / 暂停">
                             <svg id="icon-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                                 <path d="M8 5.5v13l11-6.5z" fill="currentColor"/>
@@ -135,7 +153,7 @@
                         </div>
                     </div>
 
-                    <audio id="background-music" loop preload="metadata">
+                    <audio id="background-music" preload="metadata">
                         <source src="assets/Gareth.T-玻璃.mp3" type="audio/mp3">
                         您的浏览器不支持音频元素。
                     </audio>

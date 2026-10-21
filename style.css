@@ -743,6 +743,45 @@ a, button, .playlist-item {
     margin-bottom: 20px;
 }
 
+/* 播放模式：顺序 / 单曲循环 / 随机 */
+.play-mode {
+    display: flex;
+    gap: 5px;
+    flex: none;
+}
+
+.mode-btn {
+    width: 30px;
+    height: 30px;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(31, 45, 61, 0.16);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.mode-btn:hover {
+    color: var(--accent-dark);
+    border-color: rgba(26, 188, 156, 0.4);
+    transform: translateY(-1px);
+}
+
+.mode-btn:active {
+    transform: scale(0.92);
+}
+
+.mode-btn.active {
+    color: #fff;
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    box-shadow: 0 4px 12px rgba(22, 160, 133, 0.3);
+}
+
 .toggle-btn {
     width: 52px;
     height: 52px;
