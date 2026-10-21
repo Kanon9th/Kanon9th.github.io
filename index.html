@@ -21,7 +21,7 @@
             <a href="#about">关于我</a>
             <a href="#tech">技术分享</a>
             <a href="#contact">联系我</a>
-            <a href="#guestbook">留言板</a>
+            <a href="#changelog">更新日志</a>
             <a href="anime.html" class="nav-featured">动漫鉴赏</a>
         </nav>
     </header>
@@ -155,18 +155,17 @@
                     </div>
                 </div>
 
-                <!-- 留言板 -->
-                <div class="guestbook-card" id="guestbook">
-                    <p class="now-label">留言板</p>
-                    <form id="guestbook-form" class="guestbook-form" novalidate>
-                        <div class="guestbook-fields">
-                            <input type="text" id="guest-name" class="guest-name-input" maxlength="20" placeholder="你的昵称（可选）" autocomplete="nickname">
-                            <button type="submit" class="guestbook-submit">留下留言</button>
-                        </div>
-                        <textarea id="guest-text" class="guest-text" rows="3" maxlength="500" placeholder="写下你想说的话…" required></textarea>
-                    </form>
-                    <p class="guestbook-hint">留言保存在本机浏览器中，清除缓存或更换设备后不可见。</p>
-                    <ul class="guestbook-list" id="guestbook-list"></ul>
+                <!-- 更新日志 -->
+                <div class="guestbook-card" id="changelog">
+                    <p class="now-label">更新日志</p>
+                    <ul class="changelog-list" id="changelog-list">
+                        <li class="changelog-item"><span class="changelog-date">10-22</span><span class="changelog-text">新增孙燕姿《原来你什么都不要》《开始懂了》《雨天》《我怀念的》，歌单支持按歌手、按歌名长短排序</span></li>
+                        <li class="changelog-item"><span class="changelog-date">10-21</span><span class="changelog-text">听书升级：点哪一段就从哪开始读，一章读完自动接着读下一章</span></li>
+                        <li class="changelog-item"><span class="changelog-date">10-20</span><span class="changelog-text">动漫鉴赏页上线，先放了《无职转生》片段</span></li>
+                        <li class="changelog-item"><span class="changelog-date">10-19</span><span class="changelog-text">小说支持切换书籍，自创小说《自我创作》也入库啦</span></li>
+                        <li class="changelog-item"><span class="changelog-date">10-18</span><span class="changelog-text">音乐播放器上线：本地歌单、封面、顺序/循环/随机播放</span></li>
+                        <li class="changelog-item"><span class="changelog-date">10-17</span><span class="changelog-text">博客上线：个人主页、技术分享、联系板块</span></li>
+                    </ul>
                 </div>
                 </div>
             </div>

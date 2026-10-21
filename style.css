@@ -323,7 +323,8 @@ a, button, .playlist-item {
     background-color: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 26px;
+    /* 底部 30px：正文文字区与卡片底部的间隙 */
+    padding: 26px 26px 30px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -500,11 +501,10 @@ a, button, .playlist-item {
     text-overflow: ellipsis;
 }
 
-/* 章节正文：flex 吸收卡片拉伸空间；上限让卡片高度回到 500 多，内容滚动 */
+/* 章节正文：flex 吸收卡片拉伸空间；内容不足时正文区与卡片底部保持 padding 间隙 */
 .novel-content {
     flex: 1;
     min-height: 240px;
-    max-height: 360px;
     overflow-y: auto;
     font-size: 0.95em;
     line-height: 1.75;
@@ -1200,87 +1200,19 @@ a.card:hover .card-link-icon {
 }
 
 /* ============================ */
-/* 留言板                        */
+/* 更新日志                      */
 /* ============================ */
 .guestbook-card {
     background-color: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 26px;
+    /* 底部 30px：日志文字区与卡片底部的间隙 */
+    padding: 26px 26px 30px;
     display: flex;
     flex-direction: column;
 }
 
-.guestbook-fields {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.guest-name-input {
-    flex: 1;
-    min-width: 0;
-    padding: 10px 16px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    font-family: inherit;
-    font-size: 1em;
-    color: var(--text);
-    background: #fff;
-    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
-}
-
-.guest-name-input:focus,
-.guest-text:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.15);
-}
-
-.guest-text {
-    width: 100%;
-    resize: vertical;
-    min-height: 84px;
-    padding: 12px 16px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    font-family: inherit;
-    font-size: 1em;
-    line-height: 1.6;
-    color: var(--text);
-    background: #fff;
-    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
-}
-
-.guestbook-submit {
-    flex: none;
-    padding: 10px 26px;
-    border: none;
-    border-radius: 999px;
-    background: var(--ink-soft);
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.95em;
-    transition: background 0.3s var(--ease), transform 0.25s var(--ease), box-shadow 0.3s var(--ease);
-}
-
-.guestbook-submit:hover {
-    background: var(--accent-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(22, 160, 133, 0.3);
-}
-
-.guestbook-submit:active {
-    transform: scale(0.96);
-}
-
-.guestbook-hint {
-    font-size: 0.8em;
-    color: var(--muted);
-    margin: 10px 0 18px;
-}
-
-.guestbook-list {
+.changelog-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -1288,70 +1220,41 @@ a.card:hover .card-link-icon {
     min-height: 0;
     overflow-y: auto;
     display: grid;
-    gap: 12px;
+    align-content: start;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
 }
 
-.guest-item {
-    padding: 14px 16px;
-    border-radius: 10px;
-    background: rgba(26, 188, 156, 0.05);
-    border: 1px solid var(--line);
-    /* 悬停只做颜色/阴影变化，不做位移：避免与卡片上浮叠加造成条目跳动 */
-    transition: background 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
-}
-
-.guest-item:hover {
-    background: rgba(26, 188, 156, 0.10);
-    border-color: rgba(26, 188, 156, 0.4);
-    box-shadow: var(--shadow);
-}
-
-.guest-item-head {
+.changelog-item {
     display: flex;
     align-items: baseline;
     gap: 10px;
-    margin-bottom: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(26, 188, 156, 0.05);
+    border: 1px solid var(--line);
+    transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
 }
 
-.guest-item-name {
-    font-family: "Noto Serif SC", "PingFang SC", serif;
-    font-weight: 700;
-    font-size: 0.98em;
-    color: var(--ink);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+.changelog-item:hover {
+    background: rgba(26, 188, 156, 0.10);
+    border-color: rgba(26, 188, 156, 0.4);
 }
 
-.guest-item-name::before {
-    content: "";
-    width: 8px;
-    height: 8px;
+.changelog-date {
     flex: none;
-    border-radius: 50%;
-    background: var(--accent);
-}
-
-.guest-item-time {
     font-size: 0.78em;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
     color: var(--muted);
+    white-space: nowrap;
 }
 
-.guest-item-text {
-    margin: 0;
-    font-size: 0.94em;
-    color: var(--text);
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.guestbook-empty {
-    list-style: none;
-    text-align: center;
-    color: var(--muted);
+.changelog-text {
     font-size: 0.92em;
-    padding: 18px 0 8px;
+    line-height: 1.6;
+    color: var(--text);
 }
 
 /* ============================ */
