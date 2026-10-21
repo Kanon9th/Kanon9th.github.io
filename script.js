@@ -19,22 +19,22 @@ function setRandomLyric() {
 }
 
 // --------------------------------------------------------
-// 二、歌单数据与渲染（按歌手排序）
+// 二、歌单数据与渲染（按歌名长度排序，同长度按歌手）
 // --------------------------------------------------------
 const playlists = [
-    { title: "玻璃", artist: "Gareth.T", src: "assets/Gareth.T-玻璃.mp3", cover: "assets/玻璃.jpg" },
-    { title: "一半一半", artist: "TopBarry-INDEcompany", src: "assets/TopBarry-INDEcompany-一半一半.mp3", cover: "assets/一半一半.jpg" },
-    { title: "东京不太热", artist: "封茗囧菌", src: "assets/封茗囧菌-东京不太热.mp3", cover: "assets/东京不太热.jpg" },
-    { title: "刻在我心底的名字", artist: "卢广仲", src: "assets/卢广仲-刻在我心底的名字.mp3", cover: "assets/刻在我心底的名字.jpg" },
-    { title: "原来你什么都不要", artist: "孙燕姿", src: "assets/孙燕姿/孙燕姿-原来你什么都不要.m4a", cover: "assets/孙燕姿/孙燕姿-原来你什么都不要.webp" },
-    { title: "开始懂了", artist: "孙燕姿", src: "assets/孙燕姿/孙燕姿-开始懂了.m4a", cover: "assets/孙燕姿/孙燕姿-开始懂了.webp" },
-    { title: "雨天", artist: "孙燕姿", src: "assets/孙燕姿/孙燕姿-雨天.m4a", cover: "assets/孙燕姿/孙燕姿-雨天.webp" },
-    { title: "我怀念的", artist: "孙燕姿", src: "assets/孙燕姿/孙燕姿-我怀念的.m4a", cover: "assets/孙燕姿/孙燕姿-我怀念的.webp" },
-    { title: "我不难过", artist: "孙燕姿", src: "assets/孙燕姿-我不难过.mp3", cover: "assets/我不难过.jpg" },
-    { title: "半句再见", artist: "孙燕姿", src: "assets/孙燕姿-半句再见.mp3", cover: "assets/半句再见.jpg" },
-    { title: "Susan说", artist: "陶喆", src: "assets/陶喆-Susan说.mp3", cover: "assets/Susan说.jpg" },
-    { title: "雨爱", artist: "杨丞琳", src: "assets/杨丞琳-雨爱.mp3", cover: "assets/雨爱.jpg" },
-    { title: "彩虹", artist: "周杰伦", src: "assets/周杰伦-彩虹.mp3", cover: "assets/彩虹.jpg" }
+    { title: "玻璃", artist: "Gareth.T", src: "assets/songs/Gareth.T-玻璃.mp3", cover: "assets/covers/玻璃.jpg" },
+    { title: "雨天", artist: "孙燕姿", src: "assets/songs/孙燕姿-雨天.m4a", cover: "assets/covers/孙燕姿-雨天.webp" },
+    { title: "雨爱", artist: "杨丞琳", src: "assets/songs/杨丞琳-雨爱.mp3", cover: "assets/covers/雨爱.jpg" },
+    { title: "彩虹", artist: "周杰伦", src: "assets/songs/周杰伦-彩虹.mp3", cover: "assets/covers/彩虹.jpg" },
+    { title: "一半一半", artist: "TopBarry-INDEcompany", src: "assets/songs/TopBarry-INDEcompany-一半一半.mp3", cover: "assets/covers/一半一半.jpg" },
+    { title: "半句再见", artist: "孙燕姿", src: "assets/songs/孙燕姿-半句再见.mp3", cover: "assets/covers/半句再见.jpg" },
+    { title: "开始懂了", artist: "孙燕姿", src: "assets/songs/孙燕姿-开始懂了.m4a", cover: "assets/covers/孙燕姿-开始懂了.webp" },
+    { title: "我不难过", artist: "孙燕姿", src: "assets/songs/孙燕姿-我不难过.mp3", cover: "assets/covers/我不难过.jpg" },
+    { title: "我怀念的", artist: "孙燕姿", src: "assets/songs/孙燕姿-我怀念的.m4a", cover: "assets/covers/孙燕姿-我怀念的.webp" },
+    { title: "东京不太热", artist: "封茗囧菌", src: "assets/songs/封茗囧菌-东京不太热.mp3", cover: "assets/covers/东京不太热.jpg" },
+    { title: "Susan说", artist: "陶喆", src: "assets/songs/陶喆-Susan说.mp3", cover: "assets/covers/Susan说.jpg" },
+    { title: "刻在我心底的名字", artist: "卢广仲", src: "assets/songs/卢广仲-刻在我心底的名字.mp3", cover: "assets/covers/刻在我心底的名字.jpg" },
+    { title: "原来你什么都不要", artist: "孙燕姿", src: "assets/songs/孙燕姿-原来你什么都不要.m4a", cover: "assets/covers/孙燕姿-原来你什么都不要.webp" }
 ];
 
 const musicPlayer = document.getElementById('background-music');
@@ -164,6 +164,8 @@ function saveMusicProgress() {
     try {
         localStorage.setItem('kanon_music', JSON.stringify({
             index: currentIndex,
+            title: playlists[currentIndex] ? playlists[currentIndex].title : '',
+            artist: playlists[currentIndex] ? playlists[currentIndex].artist : '',
             currentTime: musicPlayer.currentTime || 0,
             mode: playMode
         }));
@@ -878,8 +880,15 @@ guestbookForm.addEventListener('submit', (e) => {
         saved = JSON.parse(localStorage.getItem('kanon_music'));
     } catch (e) { saved = null; }
     if (!saved) return;
-    const idx = (Number.isInteger(saved.index) && saved.index >= 0 && saved.index < playlists.length)
-        ? saved.index : null;
+    // 优先按 歌名+歌手 匹配（歌单排序变化时索引会错位，避免恢复错歌）
+    let idx = null;
+    if (typeof saved.title === 'string' && saved.title) {
+        const hit = playlists.findIndex(p => p.title === saved.title && p.artist === saved.artist);
+        if (hit !== -1) idx = hit;
+    }
+    if (idx === null && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < playlists.length) {
+        idx = saved.index;
+    }
 
     if (idx !== null) {
         const song = playlists[idx];
