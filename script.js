@@ -455,15 +455,29 @@ function closeBookPanel() {
     novelBookBtn.setAttribute('aria-expanded', 'false');
 }
 
-// 章节选择面板：标题来自索引，无需加载正文，秒开
+// 章节选择面板：标题来自索引，无需加载正文；分片渲染（每批 80 章），滚动到底自动追加，避免 800+ 节点一次渲染卡顿
+const CHAPTER_BATCH = 80;
+const chapterRenderState = { count: 0, busy: false };
+
 function renderChapterList() {
     const book = novels[novelBook];
     if (!book) return;
+    chapterList.innerHTML = '';
+    chapterRenderState.count = 0;
+    chapterRenderState.busy = false;
+    renderChapterBatch(book);
+}
+
+function renderChapterBatch(book) {
+    if (chapterRenderState.busy) return;
+    chapterRenderState.busy = true;
+    const start = chapterRenderState.count;
+    const end = Math.min(book.chapters.length, start + CHAPTER_BATCH);
     const frag = document.createDocumentFragment();
-    book.chapters.forEach((title, i) => {
+    for (let i = start; i < end; i++) {
         const item = document.createElement('button');
         item.className = 'chapter-item' + (i === novelChapter ? ' active' : '');
-        item.textContent = title;
+        item.textContent = book.chapters[i];
         item.addEventListener('click', () => {
             if (i !== novelChapter) {
                 novelChapter = i;
@@ -473,21 +487,34 @@ function renderChapterList() {
             closeChapterPanel();
         });
         frag.appendChild(item);
-    });
-    chapterList.innerHTML = '';
+    }
     chapterList.appendChild(frag);
+    chapterRenderState.count = end;
+    chapterRenderState.busy = false;
+    // 首批渲染后滚动到当前章节附近
+    if (start === 0) {
+        const active = chapterList.querySelector('.chapter-item.active');
+        if (active) {
+            chapterList.scrollTop = Math.max(0, active.offsetTop - chapterList.clientHeight / 2);
+        }
+    }
 }
+
+// 章节面板滚动到接近底部时追加下一批
+chapterList.addEventListener('scroll', () => {
+    const book = novels[novelBook];
+    if (!book) return;
+    if (chapterRenderState.count >= book.chapters.length) return;
+    if (chapterList.scrollTop + chapterList.clientHeight >= chapterList.scrollHeight - 60) {
+        renderChapterBatch(book);
+    }
+});
 
 function openChapterPanel() {
     closeBookPanel();
     renderChapterList();
     novelChapterPanel.classList.add('open');
     novelChapterBtn.setAttribute('aria-expanded', 'true');
-    // 滚动到当前章节附近
-    const active = chapterList.querySelector('.chapter-item.active');
-    if (active) {
-        chapterList.scrollTop = Math.max(0, active.offsetTop - chapterList.clientHeight / 2);
-    }
 }
 
 function closeChapterPanel() {
@@ -560,7 +587,27 @@ function initNovel() {
     } catch (e) { /* 忽略损坏数据 */ }
 
     renderBookList();
-    renderNovelChapter();
+    // 分片懒加载：小说区进入视口前不加载正文分片（首屏提速），滚动到附近再渲染
+    const novelCardEl = document.querySelector('.novel-card');
+    let novelRendered = false;
+    const renderWhenVisible = () => {
+        if (novelRendered) return;
+        novelRendered = true;
+        renderNovelChapter();
+    };
+    if (novelCardEl && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                renderWhenVisible();
+                io.disconnect();
+            }
+        }, { rootMargin: '300px' });
+        io.observe(novelCardEl);
+        // 兜底：4 秒内未触发也渲染，避免观察器异常导致小说区空白
+        setTimeout(renderWhenVisible, 4000);
+    } else {
+        renderNovelChapter();
+    }
 }
 
 // --------------------------------------------------------
@@ -839,15 +886,28 @@ function renderRfBookList() {
     });
 }
 
-// 全屏内章节面板
+// 全屏内章节面板（分片渲染，滚动追加，与卡片面板一致）
+const rfChapterState = { count: 0, busy: false };
+
 function renderRfChapterList() {
     const book = novels[novelBook];
     if (!book) return;
     rfChapterList.innerHTML = '';
-    book.chapters.forEach((title, i) => {
+    rfChapterState.count = 0;
+    rfChapterState.busy = false;
+    renderRfChapterBatch(book);
+}
+
+function renderRfChapterBatch(book) {
+    if (rfChapterState.busy) return;
+    rfChapterState.busy = true;
+    const start = rfChapterState.count;
+    const end = Math.min(book.chapters.length, start + CHAPTER_BATCH);
+    const frag = document.createDocumentFragment();
+    for (let i = start; i < end; i++) {
         const item = document.createElement('button');
         item.className = 'chapter-item' + (i === novelChapter ? ' active' : '');
-        item.textContent = title;
+        item.textContent = book.chapters[i];
         item.addEventListener('click', () => {
             if (i !== novelChapter) {
                 const wasReading = readState === 'playing';
@@ -864,9 +924,25 @@ function renderRfChapterList() {
             rfChapterPanel.hidden = true;
             rfChapterBtn.classList.remove('active');
         });
-        rfChapterList.appendChild(item);
-    });
+        frag.appendChild(item);
+    }
+    rfChapterList.appendChild(frag);
+    rfChapterState.count = end;
+    rfChapterState.busy = false;
+    if (start === 0) {
+        const active = rfChapterList.querySelector('.chapter-item.active');
+        if (active) rfChapterList.scrollTop = Math.max(0, active.offsetTop - rfChapterList.clientHeight / 2);
+    }
 }
+
+rfChapterList.addEventListener('scroll', () => {
+    const book = novels[novelBook];
+    if (!book) return;
+    if (rfChapterState.count >= book.chapters.length) return;
+    if (rfChapterList.scrollTop + rfChapterList.clientHeight >= rfChapterList.scrollHeight - 60) {
+        renderRfChapterBatch(book);
+    }
+});
 
 function openReaderFullscreen() {
     const book = novels[novelBook];
