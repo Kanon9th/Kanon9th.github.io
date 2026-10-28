@@ -834,6 +834,8 @@ const rfRate = document.getElementById('rf-rate');
 const rfRateDown = document.getElementById('rf-rate-down');
 const rfRateUp = document.getElementById('rf-rate-up');
 const rfReadStop = document.getElementById('rf-read-stop');
+const rfPrevChapter = document.getElementById('rf-prev-chapter');
+const rfNextChapter = document.getElementById('rf-next-chapter');
 
 // 活动正文容器：false=卡片，true=全屏。朗读、高亮、段落点击都跟随它
 let activeReader = false;
@@ -856,6 +858,35 @@ function renderFullscreenContent() {
     rfContent.innerHTML = '';
     rfContent.appendChild(frag);
     rfContent.scrollTop = 0;
+    updateRfNav();
+}
+
+// 全屏底部上一章/下一章：边界禁用 + 朗读无缝续读 + 正文回顶
+function updateRfNav() {
+    const book = novels[novelBook];
+    if (!book) return;
+    rfPrevChapter.disabled = novelChapter <= 0;
+    rfNextChapter.disabled = novelChapter >= book.chapters.length - 1;
+}
+
+function rfGoChapter(delta) {
+    const book = novels[novelBook];
+    if (!book) return;
+    const next = novelChapter + delta;
+    if (next < 0 || next >= book.chapters.length) {
+        showToast(delta < 0 ? '已是第一章' : '已是最后一章');
+        return;
+    }
+    const wasReading = readState === 'playing';
+    novelChapter = next;
+    renderNovelChapter();
+    saveNovelProgress();
+    renderFullscreenContent();
+    if (wasReading) {
+        readState = 'playing';
+        setReadUI();
+        readFrom(0);
+    }
 }
 
 // 全屏内书籍面板
@@ -961,6 +992,7 @@ function openReaderFullscreen() {
     readerFS.hidden = false;
     document.body.style.overflow = 'hidden';
     rfContent.scrollTop = 0;
+    updateRfNav();
 }
 
 function closeReaderFullscreen() {
@@ -991,6 +1023,8 @@ fullscreenBtn.addEventListener('click', (e) => {
 });
 
 rfClose.addEventListener('click', closeReaderFullscreen);
+rfPrevChapter.addEventListener('click', () => rfGoChapter(-1));
+rfNextChapter.addEventListener('click', () => rfGoChapter(1));
 
 // 全屏内：切换章节
 rfChapterBtn.addEventListener('click', (e) => {
