@@ -13,9 +13,30 @@ const lyrics = [
     "天亮了 你还没睡 是在悔恨过去 还是在纠结那些没有答案的问题"
 ];
 
+// 点击歌词块可切换歌词（避免连续出现同一条）
+let lastLyricIndex = -1;
+
+function nextLyric() {
+    let idx;
+    do {
+        idx = Math.floor(Math.random() * lyrics.length);
+    } while (idx === lastLyricIndex && lyrics.length > 1);
+    lastLyricIndex = idx;
+    return `"${lyrics[idx]}"`;
+}
+
 function setRandomLyric() {
-    const randomIndex = Math.floor(Math.random() * lyrics.length);
-    document.getElementById('random-lyric').innerText = `"${lyrics[randomIndex]}"`;
+    document.getElementById('random-lyric').innerText = nextLyric();
+}
+
+const lyricEl = document.getElementById('random-lyric');
+if (lyricEl) {
+    lyricEl.addEventListener('click', () => {
+        lyricEl.innerText = nextLyric();
+        lyricEl.classList.remove('lyric-switch');
+        void lyricEl.offsetWidth;
+        lyricEl.classList.add('lyric-switch');
+    });
 }
 
 // --------------------------------------------------------
