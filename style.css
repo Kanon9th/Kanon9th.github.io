@@ -229,55 +229,18 @@ a, button, .playlist-item {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 28px;
-}
-
-.profile-top {
+    /* 保持重构前的模块高度（头像+介绍文字占位），避免左列变矮破坏与小说/日志的底部对齐 */
+    min-height: 290px;
     display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 18px;
+    flex-direction: column;
 }
 
-.avatar-placeholder {
-    width: 96px;
-    height: 96px;
-    flex: none;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid #fff;
-    box-shadow: 0 6px 16px rgba(31, 45, 61, 0.16);
-    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease);
-}
-
-.avatar-placeholder:hover {
-    transform: scale(1.06) rotate(-2deg);
-    border-color: var(--accent);
-}
-
-.avatar-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* 无限进步字标：合适长宽，水平居中 */
+.profile-motto {
     display: block;
-}
-
-.profile-name {
-    font-family: "Noto Serif SC", "PingFang SC", serif;
-    font-weight: 700;
-    font-size: 1.25em;
-    color: var(--ink);
-    margin: 0;
-}
-
-.profile-tagline {
-    color: var(--muted);
-    font-size: 0.92em;
-    margin: 4px 0 0;
-}
-
-.intro-text {
-    margin: 0 0 14px;
-    font-size: 0.95em;
+    width: min(280px, 100%);
+    height: auto;
+    margin: 28px auto 14px;
 }
 
 /* 随机歌词：衬线字体，颜色沿用薄荷绿体系 */
@@ -286,10 +249,11 @@ a, button, .playlist-item {
     font-weight: 500;
     font-size: 1.05em;
     color: var(--accent-dark);
-    margin: 0;
+    margin: auto 0 0;
     padding: 12px 16px;
     background: rgba(26, 188, 156, 0.08);
     border-left: 3px solid var(--accent);
+    text-align: center;
     border-radius: 0 8px 8px 0;
 }
 
