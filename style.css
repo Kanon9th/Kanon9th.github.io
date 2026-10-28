@@ -220,7 +220,7 @@ a, button, .playlist-item {
 .about-grid {
     display: grid;
     gap: 20px;
-    /* 两栏等高：留言板拉伸至与小说卡片底部对齐 */
+    /* 两栏卡片：自然高度 + 右侧滚动区高度补偿，底部平齐 */
 }
 
 /* 左栏：个人资料卡片 */
@@ -1299,12 +1299,272 @@ a.card:hover .card-link-icon {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
-    z-index: 200;
+    z-index: 400;
 }
 
 .toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+/* ============================ */
+/* 阅读全屏层：自然纸色 + 磨砂  */
+/* ============================ */
+.reader-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: #f4efe3;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5% 30px;
+    overflow: hidden;
+    animation: rf-in 0.35s var(--ease);
+}
+
+/* hidden 属性优先：防止 display 覆盖 hidden 导致层常驻 */
+.reader-fullscreen[hidden] {
+    display: none !important;
+}
+
+/* 磨砂纸纹：细噪点 + 极浅纸纤维，营造纸质质感 */
+.reader-fullscreen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+}
+
+.reader-fullscreen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(ellipse at 28% 16%, rgba(255, 255, 255, 0.55), transparent 55%),
+        radial-gradient(ellipse at 72% 84%, rgba(214, 196, 162, 0.28), transparent 60%);
+}
+
+.reader-fullscreen > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes rf-in {
+    from { opacity: 0; transform: scale(0.97) translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+.reader-fullscreen.closing {
+    animation: rf-out 0.24s var(--ease) forwards;
+}
+
+@keyframes rf-out {
+    to { opacity: 0; transform: scale(0.985) translateY(8px); }
+}
+
+.reader-fullscreen-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto 14px;
+}
+
+.rf-title {
+    font-family: "Noto Serif SC", "PingFang SC", serif;
+    font-weight: 600;
+    font-size: 1.04em;
+    color: #4a3f33;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rf-tools {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rf-tool {
+    flex: none;
+    font-family: inherit;
+    font-size: 0.86em;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(52, 96, 84, 0.35);
+    color: #346054;
+    background: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.25s var(--ease);
+}
+
+.rf-tool:hover,
+.rf-tool.active {
+    background: #346054;
+    border-color: #346054;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.rf-close {
+    border-color: rgba(150, 106, 82, 0.4);
+    color: #8a6a55;
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.rf-close:hover,
+.rf-close.active {
+    background: #8a6a55;
+    border-color: #8a6a55;
+    color: #fff;
+}
+
+/* 全屏内面板：纸色浮层 */
+.rf-panel {
+    position: absolute;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: min(420px, 92%);
+    background: rgba(255, 253, 248, 0.97);
+    border: 1px solid rgba(90, 78, 62, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 18px 48px rgba(74, 63, 51, 0.18);
+    padding: 16px;
+    max-height: 62vh;
+    overflow: hidden;
+    animation: rf-panel-in 0.28s var(--ease);
+}
+
+.rf-panel[hidden] {
+    display: none !important;
+}
+
+@keyframes rf-panel-in {
+    from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.rf-panel .book-list,
+.rf-panel .chapter-list {
+    max-height: 44vh;
+    overflow-y: auto;
+}
+
+/* 全屏内听书控制条 */
+.rf-read-bar {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(52, 96, 84, 0.18);
+    font-size: 0.88em;
+    color: #4a3f33;
+}
+
+.rf-read-bar[hidden] {
+    display: none !important;
+}
+
+.rf-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    font-size: 1.12em;
+    line-height: 2.05;
+    color: #3d352c;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(52, 96, 84, 0.4) transparent;
+    padding: 0 6px 8px 0;
+}
+
+.rf-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rf-content::-webkit-scrollbar-thumb {
+    background: rgba(52, 96, 84, 0.4);
+    border-radius: 999px;
+}
+
+.rf-content p {
+    margin: 0 0 0.85em;
+    text-indent: 2em;
+    text-align: justify;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.rf-content p:hover {
+    background: rgba(52, 96, 84, 0.07);
+}
+
+.rf-content p.reading {
+    background: rgba(212, 232, 220, 0.75);
+    color: #1f4d3f;
+    font-weight: 500;
+}
+
+.rf-hint {
+    max-width: 720px;
+    width: 100%;
+    margin: 4px auto 0;
+    text-align: center;
+    font-size: 0.8em;
+    color: rgba(74, 63, 51, 0.55);
+}
+
+/* 手机端：字号与间距适配，更大阅读舒适区 */
+@media (max-width: 767px) {
+    .reader-fullscreen {
+        padding: 12px 4% 18px;
+    }
+    .reader-fullscreen-head {
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+    .rf-tool {
+        font-size: 0.8em;
+        padding: 6px 11px;
+    }
+    .rf-title {
+        font-size: 0.98em;
+    }
+    .rf-content {
+        font-size: 1.05em;
+        line-height: 1.95;
+    }
+    .rf-content p {
+        margin-bottom: 0.9em;
+    }
+    .rf-panel {
+        top: 64px;
+        width: 94%;
+    }
+    .rf-hint {
+        font-size: 0.76em;
+    }
 }
 
 /* ============================ */
@@ -1389,5 +1649,14 @@ a.card:hover .card-link-icon {
     .card[data-visible="false"] {
         opacity: 1;
         transform: none;
+    }
+}
+
+/* ============================ */
+/* 移动端：导航较高，锚点偏移加大 */
+/* ============================ */
+@media (max-width: 767px) {
+    html {
+        scroll-padding-top: 190px;
     }
 }

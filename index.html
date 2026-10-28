@@ -77,6 +77,11 @@
                                 <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
+                        <button class="chapter-btn" id="novel-fullscreen-btn" aria-label="全屏阅读" title="全屏阅读">
+                            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                                <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="novel-content" id="novel-content"></div>
@@ -159,6 +164,7 @@
                 <div class="guestbook-card" id="changelog">
                     <p class="now-label">更新日志</p>
                     <ul class="changelog-list" id="changelog-list">
+                        <li class="changelog-item"><span class="changelog-date">2026-10-28</span><span class="changelog-text">新增阅读全屏模式：一键全屏沉浸看小说，适配手机与电脑；站点更新自此自动记录于此</span></li>
                         <li class="changelog-item"><span class="changelog-date">2026-10-22</span><span class="changelog-text">新增孙燕姿《原来你什么都不要》《开始懂了》《雨天》《我怀念的》四首曲目；歌单支持按歌手与曲名长度排序，本地资源按类型归档</span></li>
                         <li class="changelog-item"><span class="changelog-date">2026-10-22</span><span class="changelog-text">留言板重构为更新日志，优化卡片布局与文字间距；新增站点运行时长统计</span></li>
                         <li class="changelog-item"><span class="changelog-date">2026-10-22</span><span class="changelog-text">阅读与播放进度本地记忆：刷新或重新打开页面后，自动恢复上次章节与曲目</span></li>
@@ -263,6 +269,43 @@
     </footer>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- 阅读全屏层：自然纸色 + 磨砂质感，手机与电脑通用，支持切章/切书/听书/点段朗读 -->
+    <div id="reader-fullscreen" class="reader-fullscreen" hidden>
+        <div class="reader-fullscreen-head">
+            <span class="rf-title" id="rf-title"></span>
+            <div class="rf-tools">
+                <button type="button" id="rf-chapter-btn" class="rf-tool" title="切换章节">章节</button>
+                <button type="button" id="rf-book-btn" class="rf-tool" title="切换书籍">书籍</button>
+                <button type="button" id="rf-read-btn" class="rf-tool" title="朗读当前章节">听书</button>
+                <button type="button" id="rf-close" class="rf-tool rf-close" title="退出全屏">退出</button>
+            </div>
+        </div>
+
+        <!-- 全屏内：书籍面板 -->
+        <div id="rf-book-panel" class="rf-panel" hidden>
+            <p class="panel-hint">选择书籍</p>
+            <div class="book-list" id="rf-book-list"></div>
+        </div>
+
+        <!-- 全屏内：章节面板 -->
+        <div id="rf-chapter-panel" class="rf-panel" hidden>
+            <p class="panel-hint">选择章节</p>
+            <div class="chapter-list" id="rf-chapter-list"></div>
+        </div>
+
+        <!-- 全屏内：听书控制条 -->
+        <div id="rf-read-bar" class="rf-read-bar" hidden>
+            <span class="read-status" id="rf-read-status">正在朗读</span>
+            <button type="button" class="read-rate-btn" id="rf-rate-down" aria-label="放慢语速">−</button>
+            <span class="read-rate" id="rf-rate">1.0×</span>
+            <button type="button" class="read-rate-btn" id="rf-rate-up" aria-label="加快语速">+</button>
+            <button type="button" class="read-rate-btn read-stop" id="rf-read-stop" aria-label="停止朗读">停止</button>
+        </div>
+
+        <div id="rf-content" class="rf-content"></div>
+        <p class="rf-hint" id="rf-hint">点击任意段落，可从该段开始朗读</p>
+    </div>
 
     <!-- 小说章节索引（小文件）与主脚本均延迟加载，正文分片按需动态注入，不再阻塞首屏 -->
     <script src="novels/index.js" defer></script>

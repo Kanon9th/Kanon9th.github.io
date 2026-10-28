@@ -414,6 +414,11 @@ function renderNovelChapter(keepReading) {
             if (pendingAutoNext && readState === 'playing') {
                 pendingAutoNext = false;
                 readingIndex = 0;
+                // 全屏阅读模式：先刷新全屏内容再开读，避免读到旧章节
+                if (typeof activeReader !== 'undefined' && activeReader
+                    && typeof readerFS !== 'undefined' && readerFS && !readerFS.hidden) {
+                    renderFullscreenContent();
+                }
                 readFrom(0);
             }
         }));
@@ -599,13 +604,16 @@ function cancelSpeech() {
     window.speechSynthesis.cancel();
 }
 
+// 当前朗读正文容器：false=卡片，true=全屏（阅读全屏功能会切换 activeReader）
 function getParaEls() {
-    return Array.from(novelContent.querySelectorAll('p'));
+    return Array.from(getActiveContent().querySelectorAll('p'));
 }
 
 function clearHighlight() {
-    const cur = novelContent.querySelector('p.reading');
-    if (cur) cur.classList.remove('reading');
+    novelContent.querySelectorAll('p.reading').forEach((p) => p.classList.remove('reading'));
+    if (typeof rfContent !== 'undefined' && rfContent) {
+        rfContent.querySelectorAll('p.reading').forEach((p) => p.classList.remove('reading'));
+    }
 }
 
 function highlightPara(i) {
@@ -621,13 +629,19 @@ function setReadUI() {
     if (readState === 'idle') {
         novelReadBtn.textContent = '听书';
         novelReadBar.classList.remove('show');
+        if (typeof rfReadBtn !== 'undefined' && rfReadBtn) rfReadBtn.textContent = '听书';
+        if (typeof rfReadBar !== 'undefined' && rfReadBar) rfReadBar.hidden = true;
         clearHighlight();
     } else {
         novelReadBtn.textContent = readState === 'playing' ? '暂停' : '继续';
         novelReadBar.classList.add('show');
         readStatus.textContent = readState === 'playing' ? '正在朗读' : '已暂停';
+        if (typeof rfReadBtn !== 'undefined' && rfReadBtn) rfReadBtn.textContent = readState === 'playing' ? '暂停' : '继续';
+        if (typeof rfReadBar !== 'undefined' && rfReadBar) rfReadBar.hidden = false;
+        if (typeof rfReadStatus !== 'undefined' && rfReadStatus) rfReadStatus.textContent = readState === 'playing' ? '正在朗读' : '已暂停';
     }
     readRateEl.textContent = speechRate.toFixed(1) + '×';
+    if (typeof rfRate !== 'undefined' && rfRate) rfRate.textContent = speechRate.toFixed(1) + '×';
 }
 
 function stopReading() {
@@ -646,7 +660,7 @@ function onParaClick(i) {
         showToast('当前浏览器不支持语音朗读');
         return;
     }
-    if (novelContent.querySelector('.novel-tip')) {
+    if (getActiveContent().querySelector('.novel-tip')) {
         showToast('章节加载中，请稍候再听');
         return;
     }
@@ -726,6 +740,7 @@ function toggleRead() {
 function changeRate(delta) {
     speechRate = Math.min(1.8, Math.max(0.5, +(speechRate + delta).toFixed(1)));
     readRateEl.textContent = speechRate.toFixed(1) + '×';
+    if (typeof rfRate !== 'undefined' && rfRate) rfRate.textContent = speechRate.toFixed(1) + '×';
     if (readState === 'playing') {
         cancelSpeech();
         readFrom(readingIndex);
@@ -751,6 +766,232 @@ readStopBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     stopReading();
     showToast('已停止朗读');
+});
+
+// 阅读全屏：自然纸色沉浸式阅读，支持切章/切书/听书/点段朗读
+const fullscreenBtn = document.getElementById('novel-fullscreen-btn');
+const readerFS = document.getElementById('reader-fullscreen');
+const rfContent = document.getElementById('rf-content');
+const rfTitle = document.getElementById('rf-title');
+const rfClose = document.getElementById('rf-close');
+const rfChapterBtn = document.getElementById('rf-chapter-btn');
+const rfBookBtn = document.getElementById('rf-book-btn');
+const rfReadBtn = document.getElementById('rf-read-btn');
+const rfChapterPanel = document.getElementById('rf-chapter-panel');
+const rfChapterList = document.getElementById('rf-chapter-list');
+const rfBookPanel = document.getElementById('rf-book-panel');
+const rfBookList = document.getElementById('rf-book-list');
+const rfReadBar = document.getElementById('rf-read-bar');
+const rfReadStatus = document.getElementById('rf-read-status');
+const rfRate = document.getElementById('rf-rate');
+const rfRateDown = document.getElementById('rf-rate-down');
+const rfRateUp = document.getElementById('rf-rate-up');
+const rfReadStop = document.getElementById('rf-read-stop');
+
+// 活动正文容器：false=卡片，true=全屏。朗读、高亮、段落点击都跟随它
+let activeReader = false;
+
+function getActiveContent() {
+    return activeReader ? rfContent : novelContent;
+}
+
+// 全屏内渲染当前章（克隆卡片已加载段落 + 绑定“点段即读”）
+function renderFullscreenContent() {
+    const book = novels[novelBook];
+    rfTitle.textContent = `《${book.title}》 ${novelChapterName.textContent}`;
+    const frag = document.createDocumentFragment();
+    Array.from(novelContent.querySelectorAll('p.para')).forEach((p, idx) => {
+        const np = document.createElement('p');
+        np.textContent = p.textContent;
+        np.addEventListener('click', () => onParaClick(idx));
+        frag.appendChild(np);
+    });
+    rfContent.innerHTML = '';
+    rfContent.appendChild(frag);
+    rfContent.scrollTop = 0;
+}
+
+// 全屏内书籍面板
+function renderRfBookList() {
+    rfBookList.innerHTML = '';
+    novels.forEach((book, i) => {
+        const item = document.createElement('button');
+        item.className = 'book-item' + (i === novelBook ? ' active' : '');
+        item.textContent = `${book.title} · ${book.author}`;
+        item.addEventListener('click', () => {
+            if (i !== novelBook) {
+                const wasReading = readState === 'playing';
+                novelBook = i;
+                novelChapter = 0;
+                renderNovelChapter();
+                saveNovelProgress();
+                renderFullscreenContent();
+                if (wasReading) {
+                    readState = 'playing';
+                    setReadUI();
+                    readFrom(0);
+                }
+            }
+            rfBookPanel.hidden = true;
+            rfBookBtn.classList.remove('active');
+        });
+        rfBookList.appendChild(item);
+    });
+}
+
+// 全屏内章节面板
+function renderRfChapterList() {
+    const book = novels[novelBook];
+    if (!book) return;
+    rfChapterList.innerHTML = '';
+    book.chapters.forEach((title, i) => {
+        const item = document.createElement('button');
+        item.className = 'chapter-item' + (i === novelChapter ? ' active' : '');
+        item.textContent = title;
+        item.addEventListener('click', () => {
+            if (i !== novelChapter) {
+                const wasReading = readState === 'playing';
+                novelChapter = i;
+                renderNovelChapter();
+                saveNovelProgress();
+                renderFullscreenContent();
+                if (wasReading) {
+                    readState = 'playing';
+                    setReadUI();
+                    readFrom(0);
+                }
+            }
+            rfChapterPanel.hidden = true;
+            rfChapterBtn.classList.remove('active');
+        });
+        rfChapterList.appendChild(item);
+    });
+}
+
+function openReaderFullscreen() {
+    const book = novels[novelBook];
+    if (!book || !novelContent.querySelector('p.para')) return;
+    // 关闭卡片侧面板，避免叠加
+    closeBookPanel();
+    closeChapterPanel();
+    renderFullscreenContent();
+    activeReader = true;
+    // 全屏内若正在朗读则无缝续读（高亮跟随切到全屏）
+    if (readState === 'playing') {
+        readFrom(readingIndex);
+    } else {
+        setReadUI();
+    }
+    readerFS.hidden = false;
+    document.body.style.overflow = 'hidden';
+    rfContent.scrollTop = 0;
+}
+
+function closeReaderFullscreen() {
+    if (readerFS.classList.contains('closing')) return;
+    // 先把朗读容器切回卡片，再播放退出动画，避免动画期间高亮错位
+    if (readState === 'playing') {
+        activeReader = false;
+        readFrom(readingIndex);
+    } else {
+        activeReader = false;
+        clearHighlight();
+    }
+    rfChapterPanel.hidden = true;
+    rfBookPanel.hidden = true;
+    rfChapterBtn.classList.remove('active');
+    rfBookBtn.classList.remove('active');
+    readerFS.classList.add('closing');
+    setTimeout(() => {
+        readerFS.classList.remove('closing');
+        readerFS.hidden = true;
+        document.body.style.overflow = '';
+    }, 230);
+}
+
+fullscreenBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openReaderFullscreen();
+});
+
+rfClose.addEventListener('click', closeReaderFullscreen);
+
+// 全屏内：切换章节
+rfChapterBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!rfChapterPanel.hidden) {
+        rfChapterPanel.hidden = true;
+        rfChapterBtn.classList.remove('active');
+        return;
+    }
+    rfBookPanel.hidden = true;
+    rfBookBtn.classList.remove('active');
+    renderRfChapterList();
+    rfChapterPanel.hidden = false;
+    rfChapterBtn.classList.add('active');
+    const active = rfChapterList.querySelector('.chapter-item.active');
+    if (active) rfChapterList.scrollTop = Math.max(0, active.offsetTop - rfChapterList.clientHeight / 2);
+});
+
+// 全屏内：切换书籍
+rfBookBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!rfBookPanel.hidden) {
+        rfBookPanel.hidden = true;
+        rfBookBtn.classList.remove('active');
+        return;
+    }
+    rfChapterPanel.hidden = true;
+    rfChapterBtn.classList.remove('active');
+    renderRfBookList();
+    rfBookPanel.hidden = false;
+    rfBookBtn.classList.add('active');
+});
+
+// 全屏内：点击正文关闭面板（段落点击仍会触发朗读）
+rfContent.addEventListener('click', () => {
+    if (!rfChapterPanel.hidden || !rfBookPanel.hidden) {
+        rfChapterPanel.hidden = true;
+        rfBookPanel.hidden = true;
+        rfChapterBtn.classList.remove('active');
+        rfBookBtn.classList.remove('active');
+    }
+});
+
+// 全屏内：听书控制
+rfReadBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleRead();
+});
+
+rfRateDown.addEventListener('click', (e) => {
+    e.stopPropagation();
+    changeRate(-0.1);
+});
+
+rfRateUp.addEventListener('click', (e) => {
+    e.stopPropagation();
+    changeRate(0.1);
+});
+
+rfReadStop.addEventListener('click', (e) => {
+    e.stopPropagation();
+    stopReading();
+    showToast('已停止朗读');
+});
+
+// Esc：先关面板，再退全屏
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (readerFS.hidden) return;
+    if (!rfChapterPanel.hidden || !rfBookPanel.hidden) {
+        rfChapterPanel.hidden = true;
+        rfBookPanel.hidden = true;
+        rfChapterBtn.classList.remove('active');
+        rfBookBtn.classList.remove('active');
+        return;
+    }
+    closeReaderFullscreen();
 });
 
 // 八、站点运行时间：从建站日起实时累计（秒级更新）
