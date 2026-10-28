@@ -1529,10 +1529,16 @@ a.card:hover .card-link-icon {
 .rf-hint {
     max-width: 720px;
     width: 100%;
-    margin: 4px auto 0;
+    margin: 0 auto 6px;
     text-align: center;
     font-size: 0.8em;
     color: rgba(74, 63, 51, 0.55);
+}
+
+/* 段落双击朗读：移动端禁用双击缩放（不阻止双指缩放），保证双击事件可用 */
+.rf-content p,
+.novel-content p.para {
+    touch-action: manipulation;
 }
 
 /* 全屏底部：上一章 / 下一章（纸色药丸，悬浮底部，不挤压正文） */

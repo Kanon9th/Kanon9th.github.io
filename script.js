@@ -403,9 +403,9 @@ function renderNovelChapter(keepReading) {
         }
         novelContent.innerHTML = '';
         novelContent.appendChild(frag);
-        // 段落可点击：点击任意段落即从该段开始朗读
+        // 段落双击朗读：从该段开始听书
         Array.from(novelContent.querySelectorAll('p')).forEach((p, idx) => {
-            p.addEventListener('click', () => onParaClick(idx));
+            bindParaDblClick(p, idx);
         });
         novelContent.scrollTop = 0;
         requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -701,6 +701,34 @@ function stopReading() {
     }
 }
 
+// 段落双击朗读：兼容桌面与移动端（移动端原生 dblclick 会被双击缩放吞掉，用点击计时模拟）
+let paraClickTimer = null;
+let lastParaEl = null;
+let lastParaClickAt = 0;
+
+function bindParaDblClick(el, idx) {
+    el.addEventListener('click', () => {
+        const now = Date.now();
+        if (el === lastParaEl && now - lastParaClickAt <= 300) {
+            // 双击：触发朗读
+            clearTimeout(paraClickTimer);
+            paraClickTimer = null;
+            lastParaEl = null;
+            lastParaClickAt = 0;
+            onParaClick(idx);
+        } else {
+            // 第一次点击：等待可能的第二次
+            lastParaEl = el;
+            lastParaClickAt = now;
+            clearTimeout(paraClickTimer);
+            paraClickTimer = setTimeout(() => {
+                lastParaEl = null;
+                lastParaClickAt = 0;
+            }, 350);
+        }
+    });
+}
+
 // 点击正文段落：从该段开始朗读（朗读中随时切换起点，暂停态点击即续读）
 function onParaClick(i) {
     if (!hasSpeech()) {
@@ -852,7 +880,7 @@ function renderFullscreenContent() {
     Array.from(novelContent.querySelectorAll('p.para')).forEach((p, idx) => {
         const np = document.createElement('p');
         np.textContent = p.textContent;
-        np.addEventListener('click', () => onParaClick(idx));
+        bindParaDblClick(np, idx);
         frag.appendChild(np);
     });
     rfContent.innerHTML = '';
