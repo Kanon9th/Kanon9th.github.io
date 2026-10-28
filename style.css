@@ -1681,6 +1681,21 @@ a.card:hover .card-link-icon {
 /* ============================ */
 @media (max-width: 767px) {
     html {
-        scroll-padding-top: 190px;
+        scroll-padding-top: 120px;
+    }
+
+    /* 手机端顶部导航紧凑化：减少遮挡 */
+    .header {
+        padding: 10px 4% 8px;
+    }
+    .site-logo {
+        font-size: 1.15em;
+    }
+    .site-nav {
+        gap: 5px;
+    }
+    .site-nav a {
+        font-size: 0.78em;
+        padding: 5px 11px;
     }
 }
