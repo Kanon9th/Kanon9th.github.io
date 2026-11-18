@@ -1699,3 +1699,108 @@ a.card:hover .card-link-icon {
         padding: 5px 11px;
     }
 }
+/* ============================================================
+   Apple 液态玻璃按钮（Liquid Glass）
+   仅作用于交互按钮；浅色 / 深色主题自适应
+   ============================================================ */
+:is(.novel-book-btn, .chapter-btn, .read-rate-btn, .toggle-btn,
+    .mode-btn, .contact-btn, .rf-tool, .rf-nav-btn) {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(226, 248, 240, 0.06) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(26px) saturate(200%);
+    backdrop-filter: blur(26px) saturate(200%);
+    box-shadow:
+        0 8px 28px rgba(31, 58, 48, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -2px 6px rgba(31, 58, 48, 0.05);
+    transition:
+        background 0.28s var(--ease),
+        box-shadow 0.28s var(--ease),
+        border-color 0.28s var(--ease),
+        color 0.28s var(--ease),
+        transform 0.28s var(--ease);
+}
+
+:is(.novel-book-btn, .chapter-btn, .read-rate-btn, .toggle-btn,
+    .mode-btn, .contact-btn, .rf-tool, .rf-nav-btn):hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.58) 0%, rgba(226, 248, 240, 0.24) 100%);
+    border-color: rgba(255, 255, 255, 0.82);
+    color: var(--text);
+    box-shadow:
+        0 12px 34px rgba(31, 58, 48, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -2px 6px rgba(31, 58, 48, 0.04);
+    transform: translateY(-1px);
+}
+
+:is(.novel-book-btn, .chapter-btn, .read-rate-btn, .toggle-btn,
+    .mode-btn, .contact-btn, .rf-tool, .rf-nav-btn):active:not(:disabled) {
+    transform: scale(0.97);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(226, 248, 240, 0.22) 100%);
+    box-shadow:
+        0 4px 16px rgba(31, 58, 48, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 2px 6px rgba(31, 58, 48, 0.08);
+}
+
+/* 暗色主题：深色玻璃 + 白色微光边 */
+html[data-theme="dark"] :is(.novel-book-btn, .chapter-btn, .read-rate-btn, .toggle-btn,
+    .mode-btn, .contact-btn, .rf-tool, .rf-nav-btn) {
+    background: linear-gradient(135deg, rgba(58, 64, 72, 0.55) 0%, rgba(22, 26, 30, 0.42) 100%);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e8ece9;
+    box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.26),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.28);
+}
+html[data-theme="dark"] :is(.novel-book-btn, .chapter-btn, .read-rate-btn, .toggle-btn,
+    .mode-btn, .contact-btn, .rf-tool, .rf-nav-btn):hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(72, 79, 88, 0.66) 0%, rgba(30, 35, 40, 0.5) 100%);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #e8ece9;
+}
+html[data-theme="dark"] :is(.novel-book-btn, .chapter-btn, .read-rate-btn, .toggle-btn,
+    .mode-btn, .contact-btn, .rf-tool, .rf-nav-btn):active:not(:disabled) {
+    background: linear-gradient(135deg, rgba(64, 70, 78, 0.6) 0%, rgba(26, 30, 35, 0.46) 100%);
+}
+
+/* 语义强调保留：听书=薄荷玻璃；停止=警示红 */
+#novel-read-btn,
+#rf-read-btn {
+    border-color: rgba(26, 188, 156, 0.45);
+}
+
+/* 听书按钮悬停：薄荷渐变玻璃（覆盖原实心绿底，避免高光边框出现缝隙感） */
+#novel-read-btn:hover,
+#rf-read-btn:hover {
+    background: linear-gradient(135deg, rgba(210, 246, 236, 0.55) 0%, rgba(26, 188, 156, 0.14) 100%);
+    border-color: rgba(26, 188, 156, 0.55);
+    color: var(--accent-dark);
+    box-shadow:
+        0 10px 26px rgba(26, 188, 156, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -2px 6px rgba(26, 188, 156, 0.08);
+}
+html[data-theme="dark"] #novel-read-btn:hover,
+html[data-theme="dark"] #rf-read-btn:hover {
+    background: linear-gradient(135deg, rgba(26, 188, 156, 0.3) 0%, rgba(16, 42, 36, 0.35) 100%);
+    border-color: rgba(26, 188, 156, 0.5);
+    color: #9fe8d6;
+}
+.read-rate-btn.read-stop {
+    color: #bf3325;
+    border-color: rgba(191, 51, 37, 0.42);
+}
+.read-rate-btn.read-stop:hover {
+    color: #b03023;
+    border-color: rgba(191, 51, 37, 0.65);
+}
+html[data-theme="dark"] .read-rate-btn.read-stop {
+    color: #ff8b7b;
+    border-color: rgba(255, 139, 123, 0.4);
+}
+html[data-theme="dark"] .read-rate-btn.read-stop:hover {
+    color: #ffa89b;
+}
